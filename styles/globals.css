@@ -1,0 +1,351 @@
+:root {
+  /* CSS Variables for Color Palette */
+  --tahiti-gold: #e77e05;
+  --cafe-royale: #73510c;
+  --cocoa-brown: #201c1a;
+  --flax-smoke: #778658;
+  --fall-green: #ece4c0;
+  --everglade: #18482d;
+  --lightning-yellow: #f6c11f;
+  --lemon-ginger: #a79825;
+  --straw: #d5c889;
+}
+
+/* General Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--fall-green);
+}
+
+/* Login Page Styles */
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--everglade);
+}
+
+.login-card-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 0 20px;
+}
+
+.login-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem;
+  text-align: center;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: var(--lightning-yellow);
+}
+
+.login-logo h1 {
+  margin: 0 0 0 10px;
+  color: var(--lightning-yellow);
+  font-weight: bold;
+}
+
+.login-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.login-card p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--lightning-yellow);
+  color: var(--everglade);
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #d4a90a;
+}
+
+.signup-link {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.signup-link a {
+  color: var(--lightning-yellow);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin: 0.5rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Dashboard Layout Styles */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--everglade);
+  color: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  transition: width 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.toggle-sidebar-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-nav a, .sidebar-nav button {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-nav a div, .sidebar-nav button div {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-nav a div span, .sidebar-nav button div span {
+  margin-right: 0.75rem;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active, .sidebar-nav button:hover {
+  background-color: #143e27;
+}
+
+.add-product-btn {
+  background-color: var(--lightning-yellow);
+  color: var(--everglade);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  background-color: var(--fall-green);
+  padding: 1rem;
+  transition: margin-left 0.3s;
+}
+
+.main-content.collapsed {
+  margin-left: 60px;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.user-info {
+  position: relative;
+  color: var(--everglade);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.user-info:hover {
+  background-color: #0e2b1b;
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 200px;
+  z-index: 1000;
+  display: none;
+}
+
+.user-dropdown.show {
+  display: block;
+}
+
+.user-email {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--everglade);
+}
+
+.user-dropdown a, .user-dropdown div, .user-dropdown button {
+  display: block;
+  color: var(--everglade);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.user-dropdown button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.dark-mode-toggle {
+  margin: 0.75rem 0;
+}
+
+.content {
+  padding: 1rem;
+}
+
+.marketplace-header h1 {
+  color: var(--everglade);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.marketplace-header p {
+  color: var(--everglade);
+  font-size: 1.1rem;
+}
+
+/* Dark Mode */
+.dark {
+  background-color: var(--everglade);
+  color: white;
+}
+
+.dark .main-content {
+  background-color: var(--flax-smoke);
+  color: white;
+}
+
+.dark .marketplace-header h1,
+.dark .marketplace-header p {
+  color: white;
+}
+
+.dark .user-dropdown {
+  background-color: var(--cocoa-brown);
+  color: white;
+}
+
+.dark .user-dropdown a,
+.dark .user-dropdown div,
+.dark .user-dropdown button {
+  color: white;
+  border-bottom: 1px solid #444;
+}
+
+.dark .user-info {
+  color: var(--straw);
+}
+
+.dark .user-dropdown .user-email {
+  color: white;
+}
