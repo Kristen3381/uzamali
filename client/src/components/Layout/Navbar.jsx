@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ShoppingCart, User, LogOut, Menu } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
 
   return (
     <nav className="bg-primary text-white shadow-lg px-4 py-3 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-4">
-        <button className="md:hidden">
+        <button onClick={onMenuClick} className="md:hidden hover:text-highlight transition-colors">
           <Menu className="w-6 h-6" />
         </button>
         <Link to="/" className="text-2xl font-bold tracking-tight">
