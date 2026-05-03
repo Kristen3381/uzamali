@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1E5631;
+  --color-primary-light: #D5F5E3;
+  --color-accent: #27AE60;
+  --color-highlight: #F1C40F;
+}
 
 :root {
   --primary: #1E5631;
@@ -18,26 +23,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.btn-primary {
-  @apply bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-all font-semibold;
-}
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-all font-semibold;
+  }
 
-.btn-accent {
-  @apply bg-accent text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-all font-semibold;
-}
+  .btn-accent {
+    @apply bg-accent text-white px-4 py-2 rounded-md hover:opacity-90 transition-all font-semibold;
+  }
 
-.btn-highlight {
-  @apply bg-highlight text-black px-4 py-2 rounded-md hover:bg-opacity-90 transition-all font-bold;
-}
+  .btn-highlight {
+    @apply bg-highlight text-black px-4 py-2 rounded-md hover:opacity-90 transition-all font-bold;
+  }
 
-.card {
-  @apply bg-white border-2 border-primary rounded-lg shadow-md overflow-hidden;
-}
+  .card {
+    @apply bg-white border-2 border-primary rounded-lg shadow-md overflow-hidden;
+  }
 
-.badge-sustainable {
-  @apply bg-accent text-white text-xs px-2 py-1 rounded-full font-bold uppercase;
-}
+  .badge-sustainable {
+    @apply bg-accent text-white text-xs px-2 py-1 rounded-full font-bold uppercase;
+  }
 
-.input-field {
-  @apply w-full px-3 py-2 border-2 border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-accent bg-white;
+  .input-field {
+    @apply w-full px-3 py-2 border-2 border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-accent bg-white;
+  }
 }
