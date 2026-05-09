@@ -1,8 +1,12 @@
-import React from 'react';
-import { ShoppingCart, Trash2, Smartphone, ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Trash2, Smartphone, ShieldCheck, ArrowRight, Leaf, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Cart = () => {
+  const { maliPoints } = useAuth();
+  const [redeemApplied, setRedeemApplied] = useState(false);
+
   const cartItems = [
     {
       id: 1,
@@ -26,6 +30,7 @@ const Cart = () => {
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const deliveryFee = 250;
+  const discount = redeemApplied ? 100 : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -65,6 +70,40 @@ const Cart = () => {
             </div>
           ))}
 
+          {/* Mali Points Redemption */}
+          <div className="bg-gradient-to-r from-primary to-accent p-6 rounded-2xl text-white shadow-lg overflow-hidden relative">
+            <Gift className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 rotate-12" />
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
+                  <Leaf className="w-6 h-6 fill-current text-highlight" />
+                  Redeem Your Mali Points
+                </h3>
+                <p className="text-sm opacity-90 max-w-md">
+                  You have <span className="font-bold text-highlight">{maliPoints} points</span>. 
+                  Redeem 100 points for a <span className="font-bold">KES 100 discount</span> on your order!
+                </p>
+              </div>
+              <button 
+                onClick={() => {
+                  if (maliPoints >= 100) {
+                    setRedeemApplied(!redeemApplied);
+                  } else {
+                    alert("You need at least 100 Mali Points to redeem a discount.");
+                  }
+                }}
+                disabled={maliPoints < 100}
+                className={`px-6 py-3 rounded-xl font-black transition-all ${
+                  redeemApplied 
+                  ? 'bg-highlight text-black shadow-inner scale-95' 
+                  : 'bg-white text-primary hover:bg-highlight hover:text-black shadow-md'
+                } ${maliPoints < 100 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {redeemApplied ? 'REDEEMED ✓' : 'REDEEM NOW'}
+              </button>
+            </div>
+          </div>
+
           <Link to="/market" className="inline-flex items-center gap-2 text-accent font-bold hover:underline">
             <ArrowRight className="w-4 h-4 rotate-180" />
             Continue Shopping
@@ -83,9 +122,17 @@ const Cart = () => {
                 <span>Delivery Fee</span>
                 <span className="font-bold">KES {deliveryFee}</span>
               </div>
+              {redeemApplied && (
+                <div className="flex justify-between text-accent font-bold">
+                  <span className="flex items-center gap-1">
+                    <Leaf className="w-4 h-4" /> Mali Points Discount
+                  </span>
+                  <span>- KES {discount}</span>
+                </div>
+              )}
               <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex justify-between text-xl">
                 <span className="font-bold text-primary dark:text-accent">Total</span>
-                <span className="font-black text-primary dark:text-accent">KES {(subtotal + deliveryFee).toLocaleString()}</span>
+                <span className="font-black text-primary dark:text-accent">KES {(subtotal + deliveryFee - discount).toLocaleString()}</span>
               </div>
             </div>
 

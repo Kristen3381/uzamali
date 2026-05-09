@@ -5,11 +5,15 @@ import {
   Clock, 
   CheckCircle,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Leaf
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const FarmerDashboard = () => {
+  const { maliPoints } = useAuth();
+  
   const stats = [
     { label: 'Total Listings', value: '12', icon: Package, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
     { label: 'Active Listings', value: '8', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
@@ -30,10 +34,19 @@ const FarmerDashboard = () => {
           <h1 className="text-3xl font-bold text-primary dark:text-accent">Farmer Dashboard</h1>
           <p className="text-gray-600 dark:text-gray-400">Overview of your produce listings and sales performance.</p>
         </div>
-        <Link to="/farmer/add-product" className="btn-primary flex items-center justify-center gap-2 py-3 px-6 shadow-md hover:scale-105 transition-transform">
-          <Plus className="w-5 h-5" />
-          Add New Product
-        </Link>
+        <div className="flex gap-4">
+          <div className="bg-primary/10 dark:bg-accent/10 border-2 border-primary dark:border-accent p-2 px-4 rounded-xl flex items-center gap-2 shadow-sm">
+            <Leaf className="w-5 h-5 text-primary dark:text-accent fill-current" />
+            <div className="text-left">
+              <p className="text-[10px] font-bold text-gray-500 uppercase leading-none mb-1">Mali Points</p>
+              <p className="text-lg font-black text-primary dark:text-accent leading-none">{maliPoints}</p>
+            </div>
+          </div>
+          <Link to="/farmer/add-product" className="btn-primary flex items-center justify-center gap-2 py-3 px-6 shadow-md hover:scale-105 transition-transform">
+            <Plus className="w-5 h-5" />
+            Add New Product
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}

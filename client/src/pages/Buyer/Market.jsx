@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { Search, Filter, ShoppingCart, Zap, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, ShoppingCart, Zap, MapPin, BookOpen } from 'lucide-react';
+import EduPopup from '../../components/UI/EduPopup';
 
 const ProduceMarket = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isEduOpen, setIsEduOpen] = useState(false);
 
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Legumes', 'Tubers', 'Dairy', 'Agro-waste'];
+
+  useEffect(() => {
+    if (activeCategory === 'Agro-waste') {
+      setIsEduOpen(true);
+    }
+  }, [activeCategory]);
 
   const products = [
     {
@@ -59,6 +67,19 @@ const ProduceMarket = () => {
       image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=400',
       quantity: 200,
       location: 'Kabondo, Homa Bay'
+    },
+    {
+      id: 5,
+      name: 'Dried Maize Stalks',
+      category: 'Agro-waste',
+      description: 'Excellent for mulch or animal bedding. High carbon content.',
+      price: 150,
+      unit: 'bundle',
+      sellerType: 'Individual',
+      sustainable: true,
+      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=400',
+      quantity: 1000,
+      location: 'Nakuru'
     }
   ];
 
@@ -67,8 +88,35 @@ const ProduceMarket = () => {
     (p.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const buyerEduContent = (
+    <div className="space-y-4">
+      <p className="font-semibold text-primary">Why buy Agro-waste?</p>
+      <div className="grid grid-cols-1 gap-3">
+        <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg border-l-4 border-accent">
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Eco-Friendly Gardening</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">Use organic waste as mulch to retain soil moisture and suppress weeds.</p>
+        </div>
+        <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg border-l-4 border-accent">
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Cost-Effective Fodder</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">Save money by purchasing nutrient-rich stalks and husks for your livestock.</p>
+        </div>
+        <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg border-l-4 border-accent">
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Support Sustainability</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">Help farmers reduce waste and earn Mali Points for a greener Kenya!</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
+      <EduPopup 
+        isOpen={isEduOpen} 
+        onClose={() => setIsEduOpen(false)} 
+        title="The Value of Agro-waste"
+        content={buyerEduContent}
+      />
+
       {/* Search and Filter Bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 transition-colors duration-300">
         <div className="relative w-full md:w-96">

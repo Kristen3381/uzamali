@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { Upload, Camera, MapPin, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Upload, Camera, MapPin, CheckCircle2, Leaf, Zap } from 'lucide-react';
+import EduPopup from '../../components/UI/EduPopup';
+import { useAuth } from '../../context/AuthContext';
 
 const AddProduct = () => {
+  const { addPoints } = useAuth();
+  const [isEduOpen, setIsEduOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     category: 'Vegetables',
@@ -17,14 +21,51 @@ const AddProduct = () => {
   const categories = ['Vegetables', 'Fruits', 'Grains', 'Legumes', 'Tubers', 'Dairy', 'Agro-waste', 'Other'];
   const units = ['kg', 'g', 'litre', 'piece', 'crate', 'bag', 'bundle'];
 
+  useEffect(() => {
+    if (formData.category === 'Agro-waste') {
+      setIsEduOpen(true);
+    }
+  }, [formData.category]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Product Data:', formData);
-    alert('Listing created successfully! Buyers near you will be notified.');
+    if (formData.category === 'Agro-waste') {
+      addPoints(50);
+      alert('Listing created! You earned 50 Mali Points for listing agro-waste! 🌱');
+    } else {
+      alert('Listing created successfully! Buyers near you will be notified.');
+    }
   };
+
+  const eduContent = (
+    <div className="space-y-4">
+      <p className="font-semibold text-primary">Did you know? Agro-waste is a goldmine!</p>
+      <ul className="list-disc pl-5 space-y-2 text-sm">
+        <li><strong>Composting:</strong> Turn stalks and leaves into rich organic fertilizer.</li>
+        <li><strong>Animal Feed:</strong> Many "wastes" are high-nutrient fodder for livestock.</li>
+        <li><strong>Bio-energy:</strong> Dry waste can be processed into fuel briquettes.</li>
+      </ul>
+      <div className="bg-primary/10 p-3 rounded-lg border border-primary/20">
+        <p className="text-xs font-bold text-primary flex items-center gap-2">
+          <Leaf className="w-4 h-4" />
+          EARN MALI POINTS
+        </p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          By listing agro-waste on UzaMali, you help reduce carbon emissions. You earn <span className="font-bold text-primary">50 Mali Points</span> per listing!
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <EduPopup 
+        isOpen={isEduOpen} 
+        onClose={() => setIsEduOpen(false)} 
+        title="Managing Agro-waste Like a Pro"
+        content={eduContent}
+      />
+
       <div>
         <h1 className="text-3xl font-bold text-primary dark:text-accent">Add a New Product</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">Fill out the form below to list your surplus produce or agro-waste on the marketplace.</p>
@@ -32,11 +73,16 @@ const AddProduct = () => {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md border-2 border-primary-light dark:border-zinc-800 overflow-hidden transition-colors">
-          <div className="bg-primary text-white px-6 py-4">
+          <div className="bg-primary text-white px-6 py-4 flex justify-between items-center">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-highlight" />
               Product Information
             </h2>
+            {formData.category === 'Agro-waste' && (
+              <span className="bg-highlight text-black text-[10px] font-black px-2 py-1 rounded-md uppercase animate-bounce">
+                +50 Mali Points Available
+              </span>
+            )}
           </div>
           
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,6 +102,7 @@ const AddProduct = () => {
                 <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Category</label>
                 <select 
                   className="input-field"
+                  value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                 >
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
