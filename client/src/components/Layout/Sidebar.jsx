@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   History,
   MessageSquare,
+  Gift,
   X
 } from 'lucide-react';
 
@@ -21,6 +22,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/market', icon: Store, label: 'Produce Market' },
     { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
+    { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
     { to: '#', icon: Trash2, label: 'Waste Exchange' },
   ];
@@ -29,6 +31,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/market', icon: Store, label: 'Produce Market' },
     { to: '/orders', icon: History, label: 'My Orders' },
     { to: '/messages', icon: MessageSquare, label: 'Courier Chat' },
+    { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
     { to: '#', icon: Trash2, label: 'Waste Exchange' },
   ];
@@ -50,6 +53,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { to: '/market', icon: Store, label: 'Produce Market' },
         { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
+        { to: '/rewards', icon: Gift, label: 'Rewards Store' },
         { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
       ];
     }

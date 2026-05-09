@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Camera, MapPin, CheckCircle2, Leaf, Zap } from 'lucide-react';
+import { Upload, Camera, MapPin, CheckCircle2, Leaf, Zap, HelpCircle } from 'lucide-react';
 import EduPopup from '../../components/UI/EduPopup';
 import { useAuth } from '../../context/AuthContext';
 
 const AddProduct = () => {
   const { addPoints } = useAuth();
-  const [isEduOpen, setIsEduOpen] = useState(false);
+  const [activeEdu, setActiveEdu] = useState(null); // 'waste' or 'sustainable'
+  
   const [formData, setFormData] = useState({
     name: '',
     category: 'Vegetables',
@@ -23,47 +24,95 @@ const AddProduct = () => {
 
   useEffect(() => {
     if (formData.category === 'Agro-waste') {
-      setIsEduOpen(true);
+      setActiveEdu('waste');
     }
   }, [formData.category]);
 
+  const handleSustainableToggle = (checked) => {
+    setFormData({ ...formData, sustainable: checked });
+    if (checked) {
+      setActiveEdu('sustainable');
+    }
+  };
+
+  const calculatePoints = () => {
+    if (formData.category !== 'Agro-waste') return 0;
+    // Base 20 points + 2 points per kg/unit
+    return 20 + (formData.quantity * 2);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.category === 'Agro-waste') {
-      addPoints(50);
-      alert('Listing created! You earned 50 Mali Points for listing agro-waste! 🌱');
+    const points = calculatePoints();
+    if (points > 0) {
+      addPoints(points);
+      alert(`Listing created! You earned ${points} Mali Points for your contribution to the circular economy! 🌱`);
     } else {
       alert('Listing created successfully! Buyers near you will be notified.');
     }
   };
 
-  const eduContent = (
+  const wasteEduContent = (
     <div className="space-y-4">
-      <p className="font-semibold text-primary">Did you know? Agro-waste is a goldmine!</p>
-      <ul className="list-disc pl-5 space-y-2 text-sm">
-        <li><strong>Composting:</strong> Turn stalks and leaves into rich organic fertilizer.</li>
-        <li><strong>Animal Feed:</strong> Many "wastes" are high-nutrient fodder for livestock.</li>
-        <li><strong>Bio-energy:</strong> Dry waste can be processed into fuel briquettes.</li>
-      </ul>
-      <div className="bg-primary/10 p-3 rounded-lg border border-primary/20">
-        <p className="text-xs font-bold text-primary flex items-center gap-2">
-          <Leaf className="w-4 h-4" />
-          EARN MALI POINTS
-        </p>
-        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-          By listing agro-waste on UzaMali, you help reduce carbon emissions. You earn <span className="font-bold text-primary">50 Mali Points</span> per listing!
-        </p>
+      <p className="font-semibold text-primary">Circular Economy: Turning Waste to Wealth</p>
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">1</div>
+          <p className="text-sm"><strong>Biogas:</strong> Organic waste like manure or rotting fruit can generate clean cooking gas.</p>
+        </div>
+        <div className="flex gap-3">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">2</div>
+          <p className="text-sm"><strong>Briquettes:</strong> Dry stalks and husks can be compressed into smokeless charcoal alternatives.</p>
+        </div>
+        <div className="flex gap-3">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">3</div>
+          <p className="text-sm"><strong>Silage:</strong> Certain green wastes can be fermented to create high-protein animal feed for the dry season.</p>
+        </div>
       </div>
+      <div className="mt-4 p-3 bg-primary/10 rounded-lg border-2 border-dashed border-primary/30">
+        <p className="text-xs font-bold text-primary italic">"Kenya produces 8M tonnes of agri-waste annually. Selling it helps save our forests!"</p>
+      </div>
+    </div>
+  );
+
+  const sustainableEduContent = (
+    <div className="space-y-4">
+      <p className="font-semibold text-primary">What makes a product "Sustainable"?</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">By marking this product as sustainable, you confirm you use at least two of these practices:</p>
+      <ul className="grid grid-cols-1 gap-2">
+        <li className="flex items-center gap-2 text-sm bg-green-50 dark:bg-zinc-800 p-2 rounded-md">
+          <CheckCircle2 className="w-4 h-4 text-accent" /> No synthetic chemical pesticides
+        </li>
+        <li className="flex items-center gap-2 text-sm bg-green-50 dark:bg-zinc-800 p-2 rounded-md">
+          <CheckCircle2 className="w-4 h-4 text-accent" /> Efficient water drip irrigation
+        </li>
+        <li className="flex items-center gap-2 text-sm bg-green-50 dark:bg-zinc-800 p-2 rounded-md">
+          <CheckCircle2 className="w-4 h-4 text-accent" /> Use of organic compost/manure
+        </li>
+        <li className="flex items-center gap-2 text-sm bg-green-50 dark:bg-zinc-800 p-2 rounded-md">
+          <CheckCircle2 className="w-4 h-4 text-accent" /> Crop rotation for soil health
+        </li>
+      </ul>
+      <p className="text-xs text-amber-600 font-bold bg-amber-50 p-2 rounded">
+        Note: Sustainable products often sell for 15-20% higher prices on UzaMali!
+      </p>
     </div>
   );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <EduPopup 
-        isOpen={isEduOpen} 
-        onClose={() => setIsEduOpen(false)} 
+        isOpen={activeEdu === 'waste'} 
+        onClose={() => setActiveEdu(null)} 
         title="Managing Agro-waste Like a Pro"
-        content={eduContent}
+        content={wasteEduContent}
+      />
+
+      <EduPopup 
+        isOpen={activeEdu === 'sustainable'} 
+        onClose={() => setActiveEdu(null)} 
+        title="The Sustainability Standard"
+        content={sustainableEduContent}
       />
 
       <div>
@@ -79,9 +128,12 @@ const AddProduct = () => {
               Product Information
             </h2>
             {formData.category === 'Agro-waste' && (
-              <span className="bg-highlight text-black text-[10px] font-black px-2 py-1 rounded-md uppercase animate-bounce">
-                +50 Mali Points Available
-              </span>
+              <div className="flex flex-col items-end">
+                <span className="bg-highlight text-black text-[10px] font-black px-2 py-1 rounded-md uppercase animate-pulse">
+                  + {calculatePoints()} Mali Points
+                </span>
+                <span className="text-[8px] opacity-80">Based on quantity</span>
+              </div>
             )}
           </div>
           
@@ -94,12 +146,18 @@ const AddProduct = () => {
                   required 
                   className="input-field"
                   placeholder="e.g., Fresh Tomatoes"
+                  value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Category</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-bold text-primary dark:text-accent">Category</label>
+                  <button type="button" onClick={() => setActiveEdu('waste')} className="text-primary hover:text-accent">
+                    <HelpCircle className="w-4 h-4" />
+                  </button>
+                </div>
                 <select 
                   className="input-field"
                   value={formData.category}
@@ -116,6 +174,7 @@ const AddProduct = () => {
                   required 
                   className="input-field"
                   placeholder="Provide a detailed description of your product..."
+                  value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                 ></textarea>
               </div>
@@ -130,6 +189,7 @@ const AddProduct = () => {
                     required 
                     min="0"
                     className="input-field"
+                    value={formData.price}
                     onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
                   />
                 </div>
@@ -137,6 +197,7 @@ const AddProduct = () => {
                   <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Unit</label>
                   <select 
                     className="input-field"
+                    value={formData.unit}
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
                   >
                     {units.map(u => <option key={u} value={u}>{u}</option>)}
@@ -151,6 +212,7 @@ const AddProduct = () => {
                   required 
                   min="1"
                   className="input-field"
+                  value={formData.quantity}
                   onChange={(e) => setFormData({...formData, quantity: Number(e.target.value)})}
                 />
               </div>
@@ -161,6 +223,7 @@ const AddProduct = () => {
                   type="date" 
                   required 
                   className="input-field"
+                  value={formData.harvestDate}
                   onChange={(e) => setFormData({...formData, harvestDate: e.target.value})}
                 />
               </div>
@@ -174,6 +237,7 @@ const AddProduct = () => {
                     required 
                     className="input-field pl-10"
                     placeholder="Enter location or use GPS"
+                    value={formData.location}
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
                   />
                 </div>
@@ -196,24 +260,30 @@ const AddProduct = () => {
               <p className="text-xs text-gray-400 mt-2">Max 5 images (JPG, PNG, WEBP)</p>
             </div>
             
-            <div className="mt-8 flex items-center gap-3 bg-primary-light dark:bg-primary/10 p-4 rounded-lg">
+            <div className="mt-8 flex items-center gap-3 bg-primary-light dark:bg-primary/10 p-4 rounded-lg border-2 border-primary/10">
               <input 
                 type="checkbox" 
                 id="sustainable" 
-                className="w-5 h-5 text-accent border-primary rounded focus:ring-accent accent-accent"
-                onChange={(e) => setFormData({...formData, sustainable: e.target.checked})}
+                className="w-6 h-6 text-accent border-primary rounded focus:ring-accent accent-accent cursor-pointer"
+                checked={formData.sustainable}
+                onChange={(e) => handleSustainableToggle(e.target.checked)}
               />
-              <label htmlFor="sustainable" className="font-bold text-primary dark:text-accent cursor-pointer">
-                Mark as Sustainable
-              </label>
-              <span className="text-xs text-gray-500 italic ml-auto">
-                Earns you a badge and higher ranking!
-              </span>
+              <div className="flex-1">
+                <label htmlFor="sustainable" className="font-black text-primary dark:text-accent cursor-pointer flex items-center gap-2">
+                  Mark as Sustainable
+                  <button type="button" onClick={() => setActiveEdu('sustainable')}>
+                    <HelpCircle className="w-3 h-3 text-gray-400" />
+                  </button>
+                </label>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400">Earns you a premium badge and 15% higher search visibility!</p>
+              </div>
+              <span className="badge-sustainable animate-bounce">Premium Badge</span>
             </div>
           </div>
         </div>
 
-        <button type="submit" className="w-full btn-primary py-4 text-xl shadow-lg hover:scale-[1.01] transition-all">
+        <button type="submit" className="w-full btn-primary py-4 text-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+          <Zap className="w-6 h-6 fill-current text-highlight" />
           List Product for Sale
         </button>
       </form>

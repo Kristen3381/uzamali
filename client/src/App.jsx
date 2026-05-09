@@ -27,6 +27,7 @@ import AdminDashboard from './pages/Admin/Dashboard';
 // Common Pages
 import PricingTool from './pages/Common/PricingTool';
 import Chat from './pages/Common/Chat';
+import RewardsStore from './pages/Common/RewardsStore';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -50,6 +51,7 @@ function App() {
           <Route path="market" element={<ProduceMarket />} />
           <Route path="pricing-tool" element={<PricingTool />} />
           <Route path="messages" element={<Chat />} />
+          <Route path="rewards" element={<RewardsStore />} />
           
           {/* Farmer Routes */}
           <Route path="farmer/dashboard" element={
