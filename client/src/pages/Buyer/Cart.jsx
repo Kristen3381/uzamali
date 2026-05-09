@@ -30,35 +30,35 @@ const Cart = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-primary dark:text-accent flex items-center gap-3">
           <ShoppingCart className="w-8 h-8" />
           Your Shopping Cart
         </h1>
-        <p className="text-gray-600 mt-1">Review your items before proceeding to M-Pesa checkout.</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Review your items before proceeding to M-Pesa checkout.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
-            <div key={item.id} className="bg-white p-4 rounded-xl border-2 border-primary-light shadow-sm flex gap-4">
+            <div key={item.id} className="bg-white dark:bg-zinc-900 p-4 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm flex gap-4 transition-colors">
               <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
               <div className="flex-1">
                 <div className="flex justify-between">
-                  <h3 className="font-bold text-primary">{item.name}</h3>
+                  <h3 className="font-bold text-primary dark:text-accent">{item.name}</h3>
                   <button className="text-red-400 hover:text-red-600">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mb-2">Sold by: <span className="font-bold">{item.farmer}</span></p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Sold by: <span className="font-bold">{item.farmer}</span></p>
                 <div className="flex justify-between items-end">
                   <div className="flex items-center gap-3">
-                    <button className="w-8 h-8 border border-gray-200 rounded-md flex items-center justify-center font-bold">-</button>
-                    <span className="font-bold">{item.quantity}</span>
-                    <button className="w-8 h-8 border border-gray-200 rounded-md flex items-center justify-center font-bold">+</button>
+                    <button className="w-8 h-8 border border-gray-200 dark:border-zinc-700 rounded-md flex items-center justify-center font-bold dark:text-white">-</button>
+                    <span className="font-bold dark:text-white">{item.quantity}</span>
+                    <button className="w-8 h-8 border border-gray-200 dark:border-zinc-700 rounded-md flex items-center justify-center font-bold dark:text-white">+</button>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">KES {item.price} / {item.unit}</p>
-                    <p className="text-lg font-black text-primary">KES {(item.price * item.quantity).toLocaleString()}</p>
+                    <p className="text-lg font-black text-primary dark:text-accent">KES {(item.price * item.quantity).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -72,29 +72,29 @@ const Cart = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl border-2 border-primary shadow-md">
-            <h3 className="text-xl font-bold text-primary mb-6">Order Summary</h3>
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary shadow-md transition-colors">
+            <h3 className="text-xl font-bold text-primary dark:text-accent mb-6">Order Summary</h3>
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span className="font-bold">KES {subtotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Delivery Fee</span>
                 <span className="font-bold">KES {deliveryFee}</span>
               </div>
-              <div className="border-t border-gray-100 pt-4 flex justify-between text-xl">
-                <span className="font-bold text-primary">Total</span>
-                <span className="font-black text-primary">KES {(subtotal + deliveryFee).toLocaleString()}</span>
+              <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex justify-between text-xl">
+                <span className="font-bold text-primary dark:text-accent">Total</span>
+                <span className="font-black text-primary dark:text-accent">KES {(subtotal + deliveryFee).toLocaleString()}</span>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-primary-light rounded-lg border border-primary/20 flex gap-3">
-                <Smartphone className="w-6 h-6 text-primary shrink-0" />
+              <div className="p-4 bg-primary-light dark:bg-primary/10 rounded-lg border border-primary/20 flex gap-3">
+                <Smartphone className="w-6 h-6 text-primary dark:text-accent shrink-0" />
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase">Payment Method</p>
-                  <p className="text-sm font-semibold text-gray-700">M-Pesa STK Push</p>
+                  <p className="text-xs font-bold text-primary dark:text-accent uppercase">Payment Method</p>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">M-Pesa STK Push</p>
                 </div>
               </div>
 

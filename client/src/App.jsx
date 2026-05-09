@@ -26,11 +26,12 @@ import AdminDashboard from './pages/Admin/Dashboard';
 
 // Common Pages
 import PricingTool from './pages/Common/PricingTool';
+import Chat from './pages/Common/Chat';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center dark:bg-zinc-950 dark:text-white">Loading...</div>;
   if (!user) return <Navigate to="/login" />;
   if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" />;
 
@@ -48,6 +49,7 @@ function App() {
           <Route index element={<Navigate to="/market" />} />
           <Route path="market" element={<ProduceMarket />} />
           <Route path="pricing-tool" element={<PricingTool />} />
+          <Route path="messages" element={<Chat />} />
           
           {/* Farmer Routes */}
           <Route path="farmer/dashboard" element={

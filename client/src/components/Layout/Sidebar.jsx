@@ -10,6 +10,7 @@ import {
   Truck, 
   ShieldCheck,
   History,
+  MessageSquare,
   X
 } from 'lucide-react';
 
@@ -27,12 +28,14 @@ const Sidebar = ({ isOpen, onClose }) => {
   const buyerLinks = [
     { to: '/market', icon: Store, label: 'Produce Market' },
     { to: '/orders', icon: History, label: 'My Orders' },
+    { to: '/messages', icon: MessageSquare, label: 'Courier Chat' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
     { to: '#', icon: Trash2, label: 'Waste Exchange' },
   ];
 
   const courierLinks = [
     { to: '/courier/dashboard', icon: Truck, label: 'Jobs Dashboard' },
+    { to: '/messages', icon: MessageSquare, label: 'Client Chat' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
   ];
 
@@ -59,19 +62,16 @@ const Sidebar = ({ isOpen, onClose }) => {
     }
   };
 
-  const activeStyle = "flex items-center gap-3 px-4 py-3 bg-accent/20 text-primary border-r-4 border-primary font-bold transition-all";
-  const inactiveStyle = "flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-primary-light hover:text-primary transition-all";
-
   return (
     <aside className={`
-      fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 shadow-xl transform transition-transform duration-300 ease-in-out
+      fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 shadow-xl transform transition-transform duration-300 ease-in-out
       md:relative md:translate-x-0 md:shadow-none
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
     `}>
       <div className="flex flex-col h-full">
         {/* Mobile Header */}
-        <div className="flex items-center justify-between p-4 md:hidden border-b border-gray-100">
-          <span className="text-xl font-bold text-primary">Menu</span>
+        <div className="flex items-center justify-between p-4 md:hidden border-b border-gray-100 dark:border-zinc-800">
+          <span className="text-xl font-bold text-primary dark:text-accent">Menu</span>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-primary">
             <X className="w-6 h-6" />
           </button>
@@ -83,7 +83,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={({ isActive }) => (isActive ? activeStyle : inactiveStyle)}
+                className={({ isActive }) => (isActive ? 'sidebar-link-active' : 'sidebar-link-inactive')}
                 onClick={() => {
                   if (window.innerWidth < 768) onClose();
                 }}

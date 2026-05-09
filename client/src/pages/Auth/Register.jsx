@@ -34,19 +34,19 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light p-4">
-      <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl overflow-hidden border-2 border-primary">
+    <div className="min-h-screen flex items-center justify-center bg-primary-light dark:bg-zinc-950 p-4 transition-colors duration-300">
+      <div className="max-w-2xl w-full bg-white dark:bg-zinc-900 rounded-xl shadow-xl overflow-hidden border-2 border-primary transition-colors">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary">Uza<span className="text-highlight">Mali</span></h1>
-            <p className="text-gray-600 mt-2">Create your account to join the agricultural revolution.</p>
+            <h1 className="text-4xl font-bold text-primary dark:text-accent">Uza<span className="text-highlight">Mali</span></h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Create your account to join the agricultural revolution.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Full Name</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Full Name</label>
                   <input 
                     type="text" 
                     required 
@@ -56,7 +56,7 @@ const Register = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Email Address</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Email Address</label>
                   <input 
                     type="email" 
                     required 
@@ -66,7 +66,7 @@ const Register = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Phone Number (M-Pesa)</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Phone Number (M-Pesa)</label>
                   <input 
                     type="tel" 
                     required 
@@ -76,7 +76,7 @@ const Register = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Password</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Password</label>
                   <input 
                     type="password" 
                     required 
@@ -88,7 +88,7 @@ const Register = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="block text-sm font-bold text-primary">Select Your Role</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent">Select Your Role</label>
                 <div className="grid grid-cols-1 gap-3">
                   {roles.map((role) => (
                     <div 
@@ -96,16 +96,16 @@ const Register = () => {
                       onClick={() => handleRoleSelect(role.id)}
                       className={`flex items-center gap-4 p-4 border-2 rounded-lg cursor-pointer transition-all ${
                         formData.role === role.id 
-                        ? 'border-accent bg-accent bg-opacity-10 shadow-md' 
-                        : 'border-gray-200 hover:border-accent hover:bg-gray-50'
+                        ? 'border-accent bg-accent bg-opacity-10 dark:bg-accent/20 shadow-md' 
+                        : 'border-gray-200 dark:border-zinc-800 hover:border-accent hover:bg-gray-50 dark:hover:bg-zinc-800/50'
                       }`}
                     >
-                      <div className={`p-2 rounded-full ${formData.role === role.id ? 'bg-accent text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <div className={`p-2 rounded-full ${formData.role === role.id ? 'bg-accent text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400'}`}>
                         <role.icon className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-primary">{role.label}</h3>
-                        <p className="text-xs text-gray-500">{role.desc}</p>
+                        <h3 className="font-bold text-primary dark:text-accent">{role.label}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{role.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -113,13 +113,13 @@ const Register = () => {
               </div>
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3 text-lg">
+            <button type="submit" className="w-full btn-primary py-3 text-lg shadow-lg hover:scale-[1.01]">
               Create Account
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account? {' '}
               <Link to="/login" className="text-accent font-bold hover:underline">Login here</Link>
             </p>

@@ -26,12 +26,12 @@ const AddProduct = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-primary">Add a New Product</h1>
-        <p className="text-gray-600 mt-1">Fill out the form below to list your surplus produce or agro-waste on the marketplace.</p>
+        <h1 className="text-3xl font-bold text-primary dark:text-accent">Add a New Product</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Fill out the form below to list your surplus produce or agro-waste on the marketplace.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white rounded-xl shadow-md border-2 border-primary-light overflow-hidden">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md border-2 border-primary-light dark:border-zinc-800 overflow-hidden transition-colors">
           <div className="bg-primary text-white px-6 py-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-highlight" />
@@ -42,7 +42,7 @@ const AddProduct = () => {
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Product Name</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Product Name</label>
                 <input 
                   type="text" 
                   required 
@@ -53,7 +53,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Category</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Category</label>
                 <select 
                   className="input-field"
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
@@ -63,7 +63,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Description</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Description</label>
                 <textarea 
                   rows="4"
                   required 
@@ -77,7 +77,7 @@ const AddProduct = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Price (KES)</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Price (KES)</label>
                   <input 
                     type="number" 
                     required 
@@ -87,7 +87,7 @@ const AddProduct = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-primary mb-2">Unit</label>
+                  <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Unit</label>
                   <select 
                     className="input-field"
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
@@ -98,7 +98,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Quantity Available</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Quantity Available</label>
                 <input 
                   type="number" 
                   required 
@@ -109,7 +109,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Harvest Date</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Harvest Date</label>
                 <input 
                   type="date" 
                   required 
@@ -119,7 +119,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Location</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input 
@@ -135,7 +135,7 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border-2 border-primary-light overflow-hidden">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md border-2 border-primary-light dark:border-zinc-800 overflow-hidden transition-colors">
           <div className="bg-primary text-white px-6 py-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Camera className="w-5 h-5 text-highlight" />
@@ -143,20 +143,20 @@ const AddProduct = () => {
             </h2>
           </div>
           <div className="p-6">
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+            <div className="border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
               <Upload className="w-12 h-12 text-gray-400 mb-4" />
-              <p className="text-gray-600 font-semibold">Click to upload or drag and drop</p>
+              <p className="text-gray-600 dark:text-gray-400 font-semibold">Click to upload or drag and drop</p>
               <p className="text-xs text-gray-400 mt-2">Max 5 images (JPG, PNG, WEBP)</p>
             </div>
             
-            <div className="mt-8 flex items-center gap-3 bg-primary-light p-4 rounded-lg">
+            <div className="mt-8 flex items-center gap-3 bg-primary-light dark:bg-primary/10 p-4 rounded-lg">
               <input 
                 type="checkbox" 
                 id="sustainable" 
-                className="w-5 h-5 text-accent border-primary rounded focus:ring-accent"
+                className="w-5 h-5 text-accent border-primary rounded focus:ring-accent accent-accent"
                 onChange={(e) => setFormData({...formData, sustainable: e.target.checked})}
               />
-              <label htmlFor="sustainable" className="font-bold text-primary cursor-pointer">
+              <label htmlFor="sustainable" className="font-bold text-primary dark:text-accent cursor-pointer">
                 Mark as Sustainable
               </label>
               <span className="text-xs text-gray-500 italic ml-auto">

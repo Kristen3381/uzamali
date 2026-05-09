@@ -70,21 +70,21 @@ const ProduceMarket = () => {
   return (
     <div className="space-y-6">
       {/* Search and Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 transition-colors duration-300">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input 
             type="text" 
             placeholder="Search produce..." 
-            className="w-full pl-10 pr-4 py-2 border-2 border-primary-light rounded-md focus:outline-none focus:border-primary"
+            className="w-full pl-10 pr-4 py-2 border-2 border-primary-light dark:border-zinc-700 dark:bg-zinc-800 dark:text-white rounded-md focus:outline-none focus:border-primary transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-          <Filter className="text-primary w-5 h-5 shrink-0" />
-          <select className="bg-white border-2 border-primary-light rounded-md px-3 py-2 outline-none focus:border-primary shrink-0">
+          <Filter className="text-primary dark:text-accent w-5 h-5 shrink-0" />
+          <select className="bg-white dark:bg-zinc-800 dark:text-white border-2 border-primary-light dark:border-zinc-700 rounded-md px-3 py-2 outline-none focus:border-primary shrink-0 transition-colors">
             <option>Sort by: Newest First</option>
             <option>Price: Low to High</option>
             <option>Price: High to Low</option>
@@ -102,7 +102,7 @@ const ProduceMarket = () => {
             className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all ${
               activeCategory === cat 
               ? 'bg-primary text-white shadow-md' 
-              : 'bg-white text-primary border-2 border-primary hover:bg-primary-light'
+              : 'bg-white dark:bg-zinc-800 text-primary dark:text-accent border-2 border-primary dark:border-primary/50 hover:bg-primary-light dark:hover:bg-primary/20'
             }`}
           >
             {cat}
@@ -113,7 +113,7 @@ const ProduceMarket = () => {
       {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="card group flex flex-col h-full">
+          <div key={product.id} className="card group flex flex-col h-full border-primary/20 dark:border-primary/30">
             <div className="relative h-48 overflow-hidden">
               <img 
                 src={product.image} 
@@ -128,25 +128,25 @@ const ProduceMarket = () => {
                   <span className="badge-sustainable">Sustainable</span>
                 )}
               </div>
-              <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1 text-[10px] font-bold text-gray-700">
+              <div className="absolute bottom-2 right-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1 text-[10px] font-bold text-gray-700 dark:text-gray-200 transition-colors">
                 <MapPin className="w-3 h-3 text-red-500" />
                 {product.location}
               </div>
             </div>
 
             <div className="p-4 flex-1 flex flex-col">
-              <h3 className="text-lg font-bold text-primary mb-1 line-clamp-1">{product.name}</h3>
-              <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1 italic">
+              <h3 className="text-lg font-bold text-primary dark:text-accent mb-1 line-clamp-1">{product.name}</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 flex-1 italic transition-colors">
                 "{product.description}"
               </p>
               
               <div className="mb-4">
-                <span className="text-2xl font-black text-primary">KES {product.price.toLocaleString()}</span>
-                <span className="text-gray-500 text-sm font-semibold"> / {product.unit}</span>
+                <span className="text-2xl font-black text-primary dark:text-accent">KES {product.price.toLocaleString()}</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm font-semibold"> / {product.unit}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 mt-auto">
-                <button className="flex items-center justify-center gap-1 py-2 px-2 border-2 border-primary text-primary font-bold rounded-md hover:bg-primary-light transition-colors text-sm">
+                <button className="flex items-center justify-center gap-1 py-2 px-2 border-2 border-primary text-primary dark:text-accent font-bold rounded-md hover:bg-primary-light dark:hover:bg-primary/10 transition-colors text-sm">
                   <ShoppingCart className="w-4 h-4" />
                   Cart
                 </button>

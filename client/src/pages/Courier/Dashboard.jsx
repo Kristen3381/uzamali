@@ -37,14 +37,14 @@ const CourierDashboard = () => {
   ];
 
   const JobCard = ({ job, isAvailable }) => (
-    <div className="card mb-4 overflow-hidden">
-      <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-        <span className="font-mono text-xs font-bold text-gray-500">Order ID: {job.id}</span>
+    <div className="card mb-4 overflow-hidden dark:border-primary/30">
+      <div className="p-4 bg-gray-50 dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-700 flex justify-between items-center transition-colors">
+        <span className="font-mono text-xs font-bold text-gray-500 dark:text-gray-400">Order ID: {job.id}</span>
         {isAvailable ? (
-          <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">pending</span>
+          <span className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">pending</span>
         ) : (
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-            job.status === 'in transit' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
+            job.status === 'in transit' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
           }`}>
             {job.status}
           </span>
@@ -54,36 +54,36 @@ const CourierDashboard = () => {
       <div className="p-4 space-y-4">
         <div className="flex gap-3">
           <div className="flex flex-col items-center">
-            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-              <MapPin className="w-3 h-3 text-green-600" />
+            <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <MapPin className="w-3 h-3 text-green-600 dark:text-green-400" />
             </div>
-            <div className="w-0.5 h-8 bg-gray-200 my-1"></div>
-            <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center">
-              <MapPin className="w-3 h-3 text-orange-600" />
+            <div className="w-0.5 h-8 bg-gray-200 dark:bg-zinc-800 my-1"></div>
+            <div className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+              <MapPin className="w-3 h-3 text-orange-600 dark:text-orange-400" />
             </div>
           </div>
           <div className="flex-1 space-y-3">
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">Pickup From:</p>
-              <p className="text-sm font-semibold text-primary">{job.pickup}</p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Pickup From:</p>
+              <p className="text-sm font-semibold text-primary dark:text-accent">{job.pickup}</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">Deliver To:</p>
-              <p className="text-sm font-semibold text-primary">{job.delivery}</p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Deliver To:</p>
+              <p className="text-sm font-semibold text-primary dark:text-accent">{job.delivery}</p>
             </div>
           </div>
         </div>
 
-        <div className="p-3 bg-primary-light rounded-lg flex justify-between items-center">
+        <div className="p-3 bg-primary-light dark:bg-primary/10 rounded-lg flex justify-between items-center transition-colors">
           <div>
-            <p className="text-xs text-gray-500">Product: <span className="font-bold">{job.product}</span></p>
-            {isAvailable && <p className="text-xs text-gray-500">Distance: <span className="font-bold">{job.distance}</span></p>}
+            <p className="text-xs text-gray-500 dark:text-gray-400">Product: <span className="font-bold dark:text-white">{job.product}</span></p>
+            {isAvailable && <p className="text-xs text-gray-500 dark:text-gray-400">Distance: <span className="font-bold dark:text-white">{job.distance}</span></p>}
           </div>
           <div className="text-right">
             {isAvailable ? (
-              <p className="text-lg font-black text-primary">{job.fee}</p>
+              <p className="text-lg font-black text-primary dark:text-accent">{job.fee}</p>
             ) : (
-              <button className="p-2 bg-white rounded-full text-accent shadow-sm border border-accent/20">
+              <button className="p-2 bg-white dark:bg-zinc-800 rounded-full text-accent shadow-sm border border-accent/20">
                 <Phone className="w-4 h-4" />
               </button>
             )}
@@ -97,7 +97,7 @@ const CourierDashboard = () => {
           </button>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <button className="flex items-center justify-center gap-2 py-3 border-2 border-primary text-primary font-bold rounded-md text-sm">
+            <button className="flex items-center justify-center gap-2 py-3 border-2 border-primary text-primary dark:text-accent font-bold rounded-md text-sm hover:bg-primary/10 transition-colors">
               <Navigation className="w-4 h-4" />
               Navigate
             </button>
@@ -114,15 +114,15 @@ const CourierDashboard = () => {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-primary">Courier Dashboard</h1>
-        <p className="text-gray-600">Find and manage your delivery jobs.</p>
+        <h1 className="text-3xl font-bold text-primary dark:text-accent">Courier Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400">Find and manage your delivery jobs.</p>
       </div>
 
-      <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+      <div className="flex bg-white dark:bg-zinc-900 rounded-lg p-1 shadow-sm border border-gray-200 dark:border-zinc-800 transition-colors">
         <button 
           onClick={() => setActiveTab('Available')}
           className={`flex-1 py-3 font-bold rounded-md transition-all ${
-            activeTab === 'Available' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+            activeTab === 'Available' ? 'bg-primary text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800'
           }`}
         >
           Available Jobs ({availableJobs.length})
@@ -130,7 +130,7 @@ const CourierDashboard = () => {
         <button 
           onClick={() => setActiveTab('Active')}
           className={`flex-1 py-3 font-bold rounded-md transition-all ${
-            activeTab === 'Active' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+            activeTab === 'Active' ? 'bg-primary text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800'
           }`}
         >
           My Active Jobs ({activeJobs.length})
@@ -142,18 +142,18 @@ const CourierDashboard = () => {
           availableJobs.length > 0 ? (
             availableJobs.map(job => <JobCard key={job.id} job={job} isAvailable={true} />)
           ) : (
-            <div className="text-center py-20 bg-white rounded-xl border-2 border-dashed border-gray-200">
-              <Info className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-semibold">No available jobs in your area.</p>
+            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-800 transition-colors">
+              <Info className="w-12 h-12 text-gray-300 dark:text-zinc-700 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400 font-semibold">No available jobs in your area.</p>
             </div>
           )
         ) : (
           activeJobs.length > 0 ? (
             activeJobs.map(job => <JobCard key={job.id} job={job} isAvailable={false} />)
           ) : (
-            <div className="text-center py-20 bg-white rounded-xl border-2 border-dashed border-gray-200">
-              <Truck className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-semibold">You don't have any active deliveries.</p>
+            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-800 transition-colors">
+              <Truck className="w-12 h-12 text-gray-300 dark:text-zinc-700 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400 font-semibold">You don't have any active deliveries.</p>
             </div>
           )
         )}
@@ -163,21 +163,21 @@ const CourierDashboard = () => {
       <div className="h-20 md:hidden"></div>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <button className="text-primary flex flex-col items-center gap-1">
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 flex justify-around items-center p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors">
+        <button className="text-primary dark:text-accent flex flex-col items-center gap-1">
           <Truck className="w-6 h-6" />
           <span className="text-[10px] font-bold">Home</span>
         </button>
-        <button className="text-gray-400 flex flex-col items-center gap-1">
+        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
           <Clock className="w-6 h-6" />
           <span className="text-[10px] font-bold">History</span>
         </button>
-        <button className="text-gray-400 flex flex-col items-center gap-1">
+        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
           <Navigation className="w-6 h-6" />
           <span className="text-[10px] font-bold">Maps</span>
         </button>
-        <button className="text-gray-400 flex flex-col items-center gap-1">
-          <div className="w-6 h-6 rounded-full bg-gray-200"></div>
+        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
+          <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-zinc-800"></div>
           <span className="text-[10px] font-bold">Profile</span>
         </button>
       </div>

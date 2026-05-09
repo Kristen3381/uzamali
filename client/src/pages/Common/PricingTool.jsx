@@ -22,20 +22,20 @@ const PricingTool = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-primary">Market Pricing Tool</h1>
-        <p className="text-gray-600">Calculate suggested prices based on current market trends and listings near you.</p>
+        <h1 className="text-3xl font-bold text-primary dark:text-accent">Market Pricing Tool</h1>
+        <p className="text-gray-600 dark:text-gray-400">Calculate suggested prices based on current market trends and listings near you.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl border-2 border-primary-light shadow-md space-y-6">
-          <div className="flex items-center gap-2 text-primary font-bold border-b border-gray-100 pb-4">
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-md space-y-6 transition-colors duration-300">
+          <div className="flex items-center gap-2 text-primary dark:text-accent font-bold border-b border-gray-100 dark:border-zinc-800 pb-4">
             <Calculator className="w-5 h-5" />
             Price Calculator
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-primary mb-2">Select Crop Type</label>
+              <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Select Crop Type</label>
               <select 
                 className="input-field"
                 value={crop}
@@ -47,7 +47,7 @@ const PricingTool = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Quantity</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Quantity</label>
                 <input 
                   type="number" 
                   className="input-field"
@@ -57,7 +57,7 @@ const PricingTool = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-primary mb-2">Unit</label>
+                <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Unit</label>
                 <select 
                   className="input-field"
                   value={unit}
@@ -72,28 +72,28 @@ const PricingTool = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-primary-light rounded-lg text-center">
-            <p className="text-sm text-gray-500 font-semibold mb-1">Suggested Market Price</p>
-            <p className="text-4xl font-black text-primary">KES {getSuggestedPrice().toLocaleString()}</p>
+          <div className="p-4 bg-primary-light dark:bg-primary/10 rounded-lg text-center transition-colors">
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold mb-1">Suggested Market Price</p>
+            <p className="text-4xl font-black text-primary dark:text-accent transition-colors">KES {getSuggestedPrice().toLocaleString()}</p>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl border-2 border-primary-light shadow-md">
-            <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-md transition-colors duration-300">
+            <h3 className="font-bold text-primary dark:text-accent mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-accent" />
               Market Trends
             </h3>
             <div className="space-y-4">
               {Object.entries(marketRates).map(([name, data]) => (
                 <div key={name} className="flex justify-between items-center">
-                  <span className="text-gray-600 font-semibold">{name}</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-semibold">{name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400">KES {data.rate}/{data.unit || 'kg'}</span>
+                    <span className="text-xs font-bold text-gray-400 dark:text-gray-500">KES {data.rate}/{data.unit || 'kg'}</span>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                      data.trend === 'up' ? 'bg-green-100 text-green-700' :
-                      data.trend === 'down' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-700'
+                      data.trend === 'up' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                      data.trend === 'down' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                      'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-400'
                     }`}>
                       {data.trend}
                     </span>
@@ -103,9 +103,9 @@ const PricingTool = () => {
             </div>
           </div>
 
-          <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 flex gap-3">
-            <AlertTriangle className="w-6 h-6 text-yellow-600 shrink-0" />
-            <p className="text-xs text-yellow-800 leading-relaxed">
+          <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 flex gap-3 transition-colors">
+            <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 shrink-0" />
+            <p className="text-xs text-yellow-800 dark:text-yellow-400 leading-relaxed">
               <strong>Tip:</strong> Prices are estimates based on regional averages. For the best sales, consider the "Sustainable" badge to attract premium buyers!
             </p>
           </div>

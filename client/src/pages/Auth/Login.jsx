@@ -34,17 +34,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-xl overflow-hidden border-2 border-primary">
+    <div className="min-h-screen flex items-center justify-center bg-primary-light dark:bg-zinc-950 p-4 transition-colors duration-300">
+      <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-xl shadow-xl overflow-hidden border-2 border-primary transition-colors">
         <div className="p-8">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-primary">Uza<span className="text-highlight">Mali</span></h1>
-            <p className="text-gray-600 mt-2">Welcome back! Please login to your account.</p>
+            <h1 className="text-4xl font-bold text-primary dark:text-accent">Uza<span className="text-highlight">Mali</span></h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome back! Please login to your account.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-bold text-primary mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Email Address</label>
               <input 
                 type="email" 
                 required 
@@ -53,11 +53,11 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <p className="text-[10px] text-gray-400 mt-1">*Hint: use 'farmer@...', 'courier@...', or 'admin@...' for testing roles</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">*Hint: use 'farmer@...', 'courier@...', or 'admin@...' for testing roles</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-primary mb-2">Password</label>
+              <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Password</label>
               <input 
                 type="password" 
                 required 
@@ -68,13 +68,13 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3 text-lg mt-4">
+            <button type="submit" className="w-full btn-primary py-3 text-lg mt-4 shadow-lg hover:scale-[1.02]">
               Login to Market
             </button>
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account? {' '}
               <Link to="/register" className="text-accent font-bold hover:underline">Register here</Link>
             </p>

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ShoppingCart, User, LogOut, Menu } from 'lucide-react';
+import { ShoppingCart, LogOut, Menu, MessageSquare } from 'lucide-react';
+import ThemeToggle from '../UI/ThemeToggle';
 
 const Navbar = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
@@ -17,14 +18,22 @@ const Navbar = ({ onMenuClick }) => {
         </Link>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
+        <ThemeToggle />
+        
         {user?.role === 'buyer' && (
-          <Link to="/cart" className="relative hover:text-highlight transition-colors">
-            <ShoppingCart className="w-6 h-6" />
-            <span className="absolute -top-2 -right-2 bg-highlight text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              0
-            </span>
-          </Link>
+          <>
+            <Link to="/messages" className="hover:text-highlight transition-colors relative" title="Courier Chat">
+              <MessageSquare className="w-6 h-6" />
+              <span className="absolute -top-1 -right-1 bg-red-500 w-2.5 h-2.5 rounded-full border-2 border-primary"></span>
+            </Link>
+            <Link to="/cart" className="relative hover:text-highlight transition-colors">
+              <ShoppingCart className="w-6 h-6" />
+              <span className="absolute -top-2 -right-2 bg-highlight text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                0
+              </span>
+            </Link>
+          </>
         )}
         
         {user ? (
@@ -44,7 +53,7 @@ const Navbar = ({ onMenuClick }) => {
         ) : (
           <div className="flex items-center gap-4">
             <Link to="/login" className="hover:text-highlight font-semibold">Login</Link>
-            <Link to="/register" className="btn-highlight py-1 px-4">Join Us</Link>
+            <Link to="/register" className="btn-highlight py-1 px-4 text-sm md:text-base">Join Us</Link>
           </div>
         )}
       </div>
