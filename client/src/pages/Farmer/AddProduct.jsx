@@ -2,12 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Camera, MapPin, CheckCircle2, Leaf, Zap, HelpCircle } from 'lucide-react';
 import EduPopup from '../../components/UI/EduPopup';
 import { useAuth } from '../../context/AuthContext';
+import { createProduct } from '../../services/productService';
 
 const AddProduct = () => {
   const { addPoints } = useAuth();
   const fileInputRef = useRef(null);
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [activeEdu, setActiveEdu] = useState(null);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -30,6 +34,10 @@ const AddProduct = () => {
     }
   }, [formData.category]);
 
+  useEffect(() => {
+    return () => previews.forEach((p) => URL.revokeObjectURL(p));
+  }, []);
+
   const handleSustainableToggle = (checked) => {
     setFormData({ ...formData, sustainable: checked });
     if (checked) {
@@ -39,27 +47,60 @@ const AddProduct = () => {
 
   const calculatePoints = () => {
     if (formData.category !== 'Agro-waste') return 0;
-    // Base 20 points + 2 points per kg/unit
     return 20 + (formData.quantity * 2);
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + uploadedImages.length > 5) {
+    if (files.length + uploadedFiles.length > 5) {
       alert('Maximum 5 images allowed.');
       return;
     }
-    setUploadedImages(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+    setUploadedFiles((prev) => [...prev, ...files]);
+    setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
   };
 
-  const handleSubmit = (e) => {
+  const removeImage = (idx) => {
+    URL.revokeObjectURL(previews[idx]);
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== idx));
+    setPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const points = calculatePoints();
-    if (points > 0) {
-      addPoints(points);
-      alert(`Listing created! You earned ${points} Mali Points for your contribution to the circular economy!`);
-    } else {
-      alert('Listing created successfully! Buyers near you will be notified.');
+    setError('');
+    setSubmitting(true);
+
+    try {
+      const fd = new FormData();
+      fd.append('name', formData.name);
+      fd.append('category', formData.category);
+      fd.append('description', formData.description);
+      fd.append('price', formData.price);
+      fd.append('unit', formData.unit);
+      fd.append('quantity', formData.quantity);
+      fd.append('harvestDate', formData.harvestDate);
+      fd.append('location', formData.location);
+      fd.append('sustainable', formData.sustainable);
+      uploadedFiles.forEach((f) => fd.append('images', f));
+
+      await createProduct(fd);
+
+      const points = calculatePoints();
+      if (points > 0) {
+        addPoints(points);
+        alert(`Listing created! You earned ${points} Mali Points for your contribution to the circular economy!`);
+      } else {
+        alert('Listing created successfully! Buyers near you will be notified.');
+      }
+
+      setFormData({ name: '', category: 'Vegetables', description: '', price: 0, unit: 'kg', quantity: 0, harvestDate: '', location: '', sustainable: false });
+      setUploadedFiles([]);
+      setPreviews([]);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create listing');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -131,6 +172,11 @@ const AddProduct = () => {
         <p className="text-gray-600 dark:text-gray-400 mt-1">Fill out the form below to list your surplus produce or agro-waste on the marketplace.</p>
       </div>
 
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm p-4 rounded-lg">
+          {error}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="card shadow-md">
           <div className="bg-primary/80 backdrop-blur-md text-white px-6 py-4 flex justify-between items-center border-b border-white/20">
@@ -271,7 +317,7 @@ const AddProduct = () => {
             >
               <Upload className="w-12 h-12 text-gray-400 mb-4" />
               <p className="text-gray-600 dark:text-gray-400 font-semibold">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-400 mt-2">Max 5 images ({uploadedImages.length}/5 uploaded)</p>
+              <p className="text-xs text-gray-400 mt-2">Max 5 images ({uploadedFiles.length}/5 uploaded)</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -281,17 +327,14 @@ const AddProduct = () => {
                 onChange={handleImageUpload}
               />
             </div>
-            {uploadedImages.length > 0 && (
+            {previews.length > 0 && (
               <div className="mt-4 flex gap-2 flex-wrap">
-                {uploadedImages.map((src, i) => (
+                {previews.map((src, i) => (
                   <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/20">
                     <img src={src} alt={`Upload ${i+1}`} className="w-full h-full object-cover" />
                     <button
                       type="button"
-                      onClick={() => {
-                        URL.revokeObjectURL(src);
-                        setUploadedImages(prev => prev.filter((_, idx) => idx !== i));
-                      }}
+                      onClick={() => removeImage(i)}
                       className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-bl-lg hover:bg-red-600"
                     >
                       x
@@ -323,9 +366,13 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <button type="submit" className="w-full btn-primary py-4 text-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full btn-primary py-4 text-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <Zap className="w-6 h-6 fill-current text-highlight" />
-          List Product for Sale
+          {submitting ? 'Creating Listing...' : 'List Product for Sale'}
         </button>
       </form>
     </div>

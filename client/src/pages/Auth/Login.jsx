@@ -5,32 +5,26 @@ import { useAuth } from '../../context/AuthContext';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Mock authentication based on email content or role
-    let role = 'buyer';
-    if (email.includes('farmer')) role = 'farmer';
-    if (email.includes('courier')) role = 'courier';
-    if (email.includes('admin')) role = 'admin';
-
-    const mockUser = {
-      id: '1',
-      name: email.split('@')[0],
-      email: email,
-      role: role
-    };
-
-    login(mockUser);
-    
-    // Redirect based on role
-    if (role === 'farmer') navigate('/farmer/dashboard');
-    else if (role === 'courier') navigate('/courier/dashboard');
-    else if (role === 'admin') navigate('/admin/dashboard');
-    else navigate('/market');
+    setError('');
+    setSubmitting(true);
+    try {
+      const user = await login(email, password);
+      if (user.role === 'farmer') navigate('/farmer/dashboard');
+      else if (user.role === 'courier') navigate('/courier/dashboard');
+      else if (user.role === 'admin') navigate('/admin/dashboard');
+      else navigate('/market');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Check your credentials.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -43,24 +37,28 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Email Address</label>
-              <input 
-                type="email" 
-                required 
+              <input
+                type="email"
+                required
                 className="input-field"
                 placeholder="e.g. farmer@uzamali.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">*Hint: use 'farmer@...', 'courier@...', or 'admin@...' for testing roles</p>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-primary dark:text-accent mb-2">Password</label>
-              <input 
-                type="password" 
-                required 
+              <input
+                type="password"
+                required
                 className="input-field"
                 placeholder="••••••••"
                 value={password}
@@ -68,8 +66,12 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3 text-lg mt-4 shadow-lg hover:scale-[1.02]">
-              Login to Market
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full btn-primary py-3 text-lg mt-4 shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? 'Logging in...' : 'Login to Market'}
             </button>
           </form>
 

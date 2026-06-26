@@ -11,20 +11,29 @@ const Register = () => {
     role: 'buyer',
     password: ''
   });
-  const { login } = useAuth();
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleRoleSelect = (role) => {
     setFormData({ ...formData, role });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(formData);
-    
-    if (formData.role === 'farmer') navigate('/farmer/dashboard');
-    else if (formData.role === 'courier') navigate('/courier/dashboard');
-    else navigate('/market');
+    setError('');
+    setSubmitting(true);
+    try {
+      const user = await register(formData);
+      if (user.role === 'farmer') navigate('/farmer/dashboard');
+      else if (user.role === 'courier') navigate('/courier/dashboard');
+      else navigate('/market');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const roles = [
@@ -43,6 +52,11 @@ const Register = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg">
+                {error}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -113,8 +127,12 @@ const Register = () => {
               </div>
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3 text-lg shadow-lg hover:scale-[1.01]">
-              Create Account
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full btn-primary py-3 text-lg shadow-lg hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

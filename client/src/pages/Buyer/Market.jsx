@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Zap, MapPin, BookOpen, CheckCircle } from 'lucide-react';
 import EduPopup from '../../components/UI/EduPopup';
+import { getProducts, imageUrl } from '../../services/productService';
 
 const ProduceMarket = () => {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -8,6 +9,8 @@ const ProduceMarket = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [isEduOpen, setIsEduOpen] = useState(false);
   const [addedToCart, setAddedToCart] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Legumes', 'Tubers', 'Dairy', 'Agro-waste'];
 
@@ -17,73 +20,19 @@ const ProduceMarket = () => {
     }
   }, [activeCategory]);
 
-  const products = [
-    {
-      id: 1,
-      name: 'Fresh Red Tomatoes',
-      category: 'Vegetables',
-      description: 'Organic vine-ripened tomatoes from Kinangop. Perfect for salads and sauces.',
-      price: 50,
-      unit: 'kg',
-      sellerType: 'Individual',
-      sustainable: true,
-      image: 'https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?auto=format&fit=crop&q=80&w=400',
-      quantity: 100,
-      location: 'Kinangop, Nyandarua'
-    },
-    {
-      id: 2,
-      name: 'Organic Maize Grains',
-      category: 'Grains',
-      description: 'High-quality dried maize grains. Harvested last month.',
-      price: 3200,
-      unit: '90kg bag',
-      sellerType: 'Group Sell',
-      sustainable: false,
-      image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&q=80&w=400',
-      quantity: 50,
-      location: 'Kitale, Trans-Nzoia'
-    },
-    {
-      id: 3,
-      name: 'Hass Avocados',
-      category: 'Fruits',
-      description: 'Grade A Hass avocados. Rich in nutrients and creamy texture.',
-      price: 25,
-      unit: 'piece',
-      sellerType: 'Individual',
-      sustainable: true,
-      image: 'https://images.unsplash.com/photo-1523038823543-30f00b3f61e8?auto=format&fit=crop&q=80&w=400',
-      quantity: 500,
-      location: 'Murang\'a'
-    },
-    {
-      id: 4,
-      name: 'Sweet Potatoes (Yellow)',
-      category: 'Tubers',
-      description: 'Naturally grown yellow sweet potatoes. Very sweet and healthy.',
-      price: 80,
-      unit: 'kg',
-      sellerType: 'Individual',
-      sustainable: true,
-      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=400',
-      quantity: 200,
-      location: 'Kabondo, Homa Bay'
-    },
-    {
-      id: 5,
-      name: 'Dried Maize Stalks',
-      category: 'Agro-waste',
-      description: 'Excellent for mulch or animal bedding. High carbon content.',
-      price: 150,
-      unit: 'bundle',
-      sellerType: 'Individual',
-      sustainable: true,
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=400',
-      quantity: 1000,
-      location: 'Nakuru'
-    }
-  ];
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch {
+        console.error('Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
   const filteredProducts = products
     .filter(p => 
@@ -174,18 +123,24 @@ const ProduceMarket = () => {
       </div>
 
       {/* Product Grid */}
+      {loading ? (
+        <div className="text-center py-20 text-gray-400 text-lg">Loading products...</div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-20 text-gray-400 text-lg">No products found</div>
+      ) : (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="card group flex flex-col h-full border-primary/20 dark:border-primary/30">
+          <div key={product._id} className="card group flex flex-col h-full border-primary/20 dark:border-primary/30">
             <div className="relative h-48 overflow-hidden">
               <img 
-                src={product.image} 
+                src={imageUrl(product.images?.[0]) || 'https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?auto=format&fit=crop&q=80&w=400'} 
                 alt={product.name} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?auto=format&fit=crop&q=80&w=400'; }}
               />
               <div className="absolute top-2 left-2 flex flex-col gap-1">
-                <span className={`text-[10px] font-bold px-2 py-1 rounded-md text-white ${product.sellerType === 'Group Sell' ? 'bg-blue-600' : 'bg-primary'}`}>
-                  {product.sellerType}
+                <span className="text-[10px] font-bold px-2 py-1 rounded-md text-white bg-primary">
+                  Listed
                 </span>
                 {product.sustainable && (
                   <span className="badge-sustainable">Sustainable</span>
@@ -211,16 +166,16 @@ const ProduceMarket = () => {
               <div className="grid grid-cols-2 gap-2 mt-auto">
                 <button
                   onClick={() => {
-                    setAddedToCart(product.id);
+                    setAddedToCart(product._id);
                     setTimeout(() => setAddedToCart(null), 2000);
                   }}
                   className={`flex items-center justify-center gap-1 py-2 px-2 border-2 font-bold rounded-md text-sm transition-all ${
-                    addedToCart === product.id
+                    addedToCart === product._id
                       ? 'border-accent bg-accent text-white'
                       : 'border-primary text-primary dark:text-accent hover:bg-primary-light dark:hover:bg-primary/10'
                   }`}
                 >
-                  {addedToCart === product.id ? (
+                  {addedToCart === product._id ? (
                     <><CheckCircle className="w-4 h-4" /> Added</>
                   ) : (
                     <><ShoppingCart className="w-4 h-4" /> Cart</>
@@ -238,6 +193,7 @@ const ProduceMarket = () => {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 };

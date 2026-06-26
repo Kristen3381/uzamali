@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -8,43 +9,59 @@ export const AuthProvider = ({ children }) => {
   const [maliPoints, setMaliPoints] = useState(0);
 
   useEffect(() => {
-    // Check local storage for existing token/user
-    const savedUser = localStorage.getItem('uzamali_user');
-    const savedPoints = localStorage.getItem('uzamali_points');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const token = localStorage.getItem('uzamali_token');
+    if (!token) {
+      setLoading(false);
+      return;
     }
-    if (savedPoints) {
-      setMaliPoints(parseInt(savedPoints));
-    }
-    setLoading(false);
+    api.get('/auth/me')
+      .then((res) => {
+        setUser(res.data.user);
+        setMaliPoints(res.data.user.maliPoints ?? 0);
+      })
+      .catch(() => {
+        localStorage.removeItem('uzamali_token');
+        localStorage.removeItem('uzamali_points');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('uzamali_user', JSON.stringify(userData));
-    // Reset points for mock login
-    const initialPoints = userData.role === 'farmer' ? 150 : 0;
-    setMaliPoints(initialPoints);
-    localStorage.setItem('uzamali_points', initialPoints.toString());
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
+    localStorage.setItem('uzamali_token', data.token);
+    localStorage.setItem('uzamali_user', JSON.stringify(data.user));
+    localStorage.setItem('uzamali_points', data.user.maliPoints.toString());
+    setUser(data.user);
+    setMaliPoints(data.user.maliPoints);
+    return data.user;
+  };
+
+  const register = async (userData) => {
+    const { data } = await api.post('/auth/register', userData);
+    localStorage.setItem('uzamali_token', data.token);
+    localStorage.setItem('uzamali_user', JSON.stringify(data.user));
+    localStorage.setItem('uzamali_points', data.user.maliPoints.toString());
+    setUser(data.user);
+    setMaliPoints(data.user.maliPoints);
+    return data.user;
   };
 
   const logout = () => {
     setUser(null);
     setMaliPoints(0);
-    localStorage.removeItem('uzamali_user');
     localStorage.removeItem('uzamali_token');
+    localStorage.removeItem('uzamali_user');
     localStorage.removeItem('uzamali_points');
   };
 
-  const addPoints = (amount) => {
+  const addPoints = async (amount) => {
     const newPoints = maliPoints + amount;
     setMaliPoints(newPoints);
     localStorage.setItem('uzamali_points', newPoints.toString());
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, maliPoints, addPoints }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, maliPoints, addPoints }}>
       {children}
     </AuthContext.Provider>
   );
