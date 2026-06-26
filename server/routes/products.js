@@ -34,7 +34,7 @@ const router = Router();
 router.get('/', async (_req, res) => {
   try {
     const { category, search, sort } = _req.query;
-    const filter = {};
+    const filter = { status: 'available' };
 
     if (category && category !== 'All') {
       filter.category = category;
@@ -72,6 +72,65 @@ router.get('/:id', async (req, res) => {
     res.json({ product });
   } catch {
     res.status(500).json({ message: 'Failed to fetch product' });
+  }
+});
+
+router.get('/mine', protect, async (req, res) => {
+  try {
+    const products = await Product.find({ seller: req.user._id }).sort({ createdAt: -1 });
+    res.json({ products });
+  } catch {
+    res.status(500).json({ message: 'Failed to fetch your products' });
+  }
+});
+
+router.patch('/:id', protect, upload.array('images', 5), async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    if (product.seller.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to edit this product' });
+    }
+
+    const fields = ['name', 'category', 'description', 'price', 'unit', 'quantity', 'harvestDate', 'location', 'status'];
+    fields.forEach((f) => {
+      if (req.body[f] !== undefined) product[f] = req.body[f];
+    });
+    if (req.body.sustainable !== undefined) product.sustainable = req.body.sustainable === 'true';
+
+    if (req.files?.length) {
+      const newImages = req.files.map((f) => `/uploads/${f.filename}`);
+      product.images = req.body.keepImages
+        ? [...JSON.parse(req.body.keepImages), ...newImages]
+        : newImages;
+    }
+
+    await product.save();
+    res.json({ product });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    res.status(500).json({ message: 'Failed to update product' });
+  }
+});
+
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    if (product.seller.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this product' });
+    }
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product removed' });
+  } catch {
+    res.status(500).json({ message: 'Failed to delete product' });
   }
 });
 

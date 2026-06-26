@@ -52,17 +52,25 @@ const FarmerDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.label} className="card flex items-center gap-4 p-6">
-            <div className={`p-3 rounded-lg ${stat.bg} ${stat.color}`}>
-              <stat.icon className="w-6 h-6" />
+        {stats.map((stat) => {
+          const isLink = stat.label === 'Total Listings' || stat.label === 'Active Listings';
+          const content = (
+            <div className={`card flex items-center gap-4 p-6 ${isLink ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}>
+              <div className={`p-3 rounded-lg ${stat.bg} ${stat.color}`}>
+                <stat.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold">{stat.label}</p>
+                <p className="text-2xl font-bold text-gray-800 dark:text-white transition-colors">{stat.value}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold">{stat.label}</p>
-              <p className="text-2xl font-bold text-gray-800 dark:text-white transition-colors">{stat.value}</p>
-            </div>
-          </div>
-        ))}
+          );
+          return isLink ? (
+            <Link key={stat.label} to="/farmer/products">{content}</Link>
+          ) : (
+            <div key={stat.label}>{content}</div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

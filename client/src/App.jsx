@@ -12,6 +12,8 @@ import Register from './pages/Auth/Register';
 // Farmer Pages
 import FarmerDashboard from './pages/Farmer/Dashboard';
 import AddProduct from './pages/Farmer/AddProduct';
+import MyProducts from './pages/Farmer/MyProducts';
+import EditProduct from './pages/Farmer/EditProduct';
 
 // Buyer Pages
 import ProduceMarket from './pages/Buyer/Market';
@@ -62,6 +64,16 @@ function App() {
           <Route path="farmer/add-product" element={
             <ProtectedRoute allowedRoles={['farmer']}>
               <AddProduct />
+            </ProtectedRoute>
+          } />
+          <Route path="farmer/products" element={
+            <ProtectedRoute allowedRoles={['farmer']}>
+              <MyProducts />
+            </ProtectedRoute>
+          } />
+          <Route path="farmer/edit-product/:id" element={
+            <ProtectedRoute allowedRoles={['farmer']}>
+              <EditProduct />
             </ProtectedRoute>
           } />
 

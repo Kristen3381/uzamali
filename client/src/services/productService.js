@@ -24,3 +24,20 @@ export const createProduct = async (formData) => {
   });
   return data.product;
 };
+
+export const updateProduct = async (id, formData) => {
+  const { data } = await api.patch(`/products/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data.product;
+};
+
+export const deleteProduct = async (id) => {
+  const { data } = await api.delete(`/products/${id}`);
+  return data;
+};
+
+export const getMyProducts = async () => {
+  const { data } = await api.get('/products/mine');
+  return data.products;
+};

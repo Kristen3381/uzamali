@@ -44,6 +44,11 @@ const productSchema = new mongoose.Schema({
   images: [{
     type: String,
   }],
+  status: {
+    type: String,
+    enum: ['available', 'sold'],
+    default: 'available',
+  },
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

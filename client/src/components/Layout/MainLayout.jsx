@@ -9,6 +9,7 @@ import {
   Trash2,
   Calculator,
   PlusCircle,
+  Package,
   Truck,
   ShieldCheck,
   History,
@@ -40,6 +41,7 @@ const MobileDropdown = ({ isOpen, onClose }) => {
 
   const farmerLinks = [
     { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/farmer/products', icon: Package, label: 'My Products' },
     { to: '/market', icon: Store, label: 'Produce Market' },
     { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
     { to: '/rewards', icon: Gift, label: 'Rewards Store' },
