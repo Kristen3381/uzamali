@@ -29,6 +29,17 @@ const categoryUseMap = {
   'agro-waste': ['animal-feed', 'composting-biogas', 'heavy-discount-resale'],
 };
 
+const frontendCategoryToBackend = {
+  'Vegetables': 'fresh',
+  'Fruits': 'fresh',
+  'Grains': 'surplus',
+  'Legumes': 'surplus',
+  'Tubers': 'fresh',
+  'Dairy': 'fresh',
+  'Agro-waste': 'agro-waste',
+  'Other': 'fresh',
+};
+
 const matchBuyers = async (listing) => {
   try {
     const prefs = await BuyerPreference.find({
@@ -76,7 +87,9 @@ router.get('/market', async (req, res) => {
     const { category, suggestedUse, search, sort } = req.query;
     const filter = { status: 'active' };
 
-    if (category) filter.category = category;
+    if (category) {
+      filter.category = frontendCategoryToBackend[category] || category;
+    }
     if (suggestedUse) filter.suggestedUse = suggestedUse;
 
     if (search) {
@@ -92,16 +105,46 @@ router.get('/market', async (req, res) => {
     }
 
     const listings = await Listing.find(filter).sort(sortOption).populate('farmer', 'name location sellerTrustLevel');
-    res.json({ listings });
+    res.json({ products: listings });
   } catch {
     res.status(500).json({ message: 'Failed to fetch listings' });
+  }
+});
+
+router.get('/', async (req, res) => {
+  try {
+    const { category, suggestedUse, search, sort } = req.query;
+    const filter = { status: 'active' };
+
+    if (category) {
+      const backendCat = frontendCategoryToBackend[category] || category;
+      filter.category = backendCat;
+    }
+    if (suggestedUse) filter.suggestedUse = suggestedUse;
+
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [{ title: regex }, { description: regex }, { location: regex }];
+    }
+
+    let sortOption = {};
+    switch (sort) {
+      case 'price-low': sortOption = { price: 1 }; break;
+      case 'price-high': sortOption = { price: -1 }; break;
+      default: sortOption = { createdAt: -1 };
+    }
+
+    const listings = await Listing.find(filter).sort(sortOption).populate('farmer', 'name location sellerTrustLevel');
+    res.json({ products: listings });
+  } catch {
+    res.status(500).json({ message: 'Failed to fetch products' });
   }
 });
 
 router.get('/mine', protect, async (req, res) => {
   try {
     const listings = await Listing.find({ farmer: req.user._id }).sort({ createdAt: -1 });
-    res.json({ listings });
+    res.json({ products: listings });
   } catch {
     res.status(500).json({ message: 'Failed to fetch your listings' });
   }
@@ -111,7 +154,7 @@ router.get('/:id', async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id).populate('farmer', 'name location sellerTrustLevel');
     if (!listing) return res.status(404).json({ message: 'Listing not found' });
-    res.json({ listing });
+    res.json({ product: listing });
   } catch {
     res.status(500).json({ message: 'Failed to fetch listing' });
   }
@@ -119,13 +162,16 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
   try {
-    const { title, description, category, suggestedUse, price, unit, quantity, harvestDate, location } = req.body;
+    const { name, title, description, category, suggestedUse, price, unit, quantity, harvestDate, location, sustainable } = req.body;
 
-    if (!category) {
-      return res.status(400).json({ message: 'Category is required (fresh, surplus, or agro-waste)' });
+    const resolvedTitle = name || title;
+    if (!resolvedTitle) {
+      return res.status(400).json({ message: 'Product name is required' });
     }
-    if (!['fresh', 'surplus', 'agro-waste'].includes(category)) {
-      return res.status(400).json({ message: 'Category must be fresh, surplus, or agro-waste' });
+
+    const backendCategory = frontendCategoryToBackend[category] || category;
+    if (!backendCategory || !['fresh', 'surplus', 'agro-waste'].includes(backendCategory)) {
+      return res.status(400).json({ message: 'Category must be one of: Vegetables, Fruits, Grains, Legumes, Tubers, Dairy, Agro-waste, or Other' });
     }
 
     const images = req.files ? req.files.map((f) => `/uploads/${f.filename}`) : [];
@@ -133,30 +179,31 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
       return res.status(400).json({ message: 'At least one image is required' });
     }
 
-    if (suggestedUse && !categoryUseMap[category]?.includes(suggestedUse)) {
+    const resolvedSuggestedUse = suggestedUse || categoryUseMap[backendCategory][0];
+    if (!categoryUseMap[backendCategory]?.includes(resolvedSuggestedUse)) {
       return res.status(400).json({
-        message: `Suggested use "${suggestedUse}" is not valid for category "${category}". ` +
-          `Valid uses: ${categoryUseMap[category].join(', ')}`,
+        message: `Suggested use "${resolvedSuggestedUse}" is not valid for category "${category}".`,
       });
     }
 
     const listing = await Listing.create({
       farmer: req.user._id,
-      title,
+      title: resolvedTitle,
       description,
-      category,
-      suggestedUse: suggestedUse || categoryUseMap[category][0],
+      category: backendCategory,
+      suggestedUse: resolvedSuggestedUse,
       price: Number(price),
       unit,
       quantity: Number(quantity),
       harvestDate: harvestDate || undefined,
       location,
       images,
+      sustainable: sustainable === 'true' || sustainable === true,
     });
 
     matchBuyers(listing);
 
-    res.status(201).json({ listing });
+    res.status(201).json({ product: listing });
   } catch (err) {
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((e) => e.message);
@@ -174,9 +221,31 @@ router.patch('/:id', protect, upload.array('images', 5), async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const fields = ['title', 'description', 'category', 'suggestedUse', 'price', 'unit', 'quantity', 'harvestDate', 'location', 'status'];
-    fields.forEach((f) => {
-      if (req.body[f] !== undefined) listing[f] = req.body[f];
+    const fieldMap = {
+      name: 'title',
+      title: 'title',
+      category: 'category',
+      suggestedUse: 'suggestedUse',
+      price: 'price',
+      unit: 'unit',
+      quantity: 'quantity',
+      harvestDate: 'harvestDate',
+      location: 'location',
+      status: 'status',
+      sustainable: 'sustainable',
+    };
+    Object.entries(fieldMap).forEach(([frontendField, backendField]) => {
+      if (req.body[frontendField] !== undefined) {
+        if (frontendField === 'name') {
+          listing.title = req.body.name;
+        } else if (frontendField === 'category') {
+          listing.category = frontendCategoryToBackend[req.body.category] || req.body.category;
+        } else if (frontendField === 'status') {
+          listing.status = req.body.status === 'available' ? 'active' : req.body.status;
+        } else {
+          listing[backendField] = req.body[frontendField];
+        }
+      }
     });
 
     if (req.files?.length) {
@@ -186,7 +255,7 @@ router.patch('/:id', protect, upload.array('images', 5), async (req, res) => {
     }
 
     await listing.save();
-    res.json({ listing });
+    res.json({ product: listing });
   } catch (err) {
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((e) => e.message);
@@ -204,7 +273,7 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
     await Listing.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Listing removed' });
+    res.json({ message: 'Product removed' });
   } catch {
     res.status(500).json({ message: 'Failed to delete listing' });
   }

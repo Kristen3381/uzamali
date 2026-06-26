@@ -31,7 +31,16 @@ const listingSchema = new mongoose.Schema({
     validate: [arr => arr.length > 0, 'At least one image is required'],
   },
   status: { type: String, enum: ['active', 'sold', 'expired'], default: 'active' },
-}, { timestamps: true });
+  sustainable: { type: Boolean, default: false },
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+});
+
+listingSchema.virtual('name').get(function () {
+  return this.title;
+});
 
 listingSchema.index({ category: 1, status: 1 });
 listingSchema.index({ suggestedUse: 1 });
