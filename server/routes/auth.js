@@ -10,26 +10,48 @@ const signToken = (id) =>
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, phone, role, password } = req.body;
+    const { name, phone, email, role, password, location } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.status(400).json({ message: 'Email already registered' });
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
+
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) {
+      return res.status(400).json({ message: 'Phone number already registered' });
+    }
+
+    if (email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
     }
 
     const initialPoints = role === 'farmer' ? 150 : 0;
-    const user = await User.create({ name, email, phone, role, password, maliPoints: initialPoints });
+    const sellerTrustLevel = role === 'farmer' ? 'new' : undefined;
+
+    const user = await User.create({
+      name,
+      phone,
+      email: email || undefined,
+      role,
+      password,
+      maliPoints: initialPoints,
+      sellerTrustLevel,
+      location: location ? { lat: location.lat, lng: location.lng } : undefined,
+    });
 
     const token = signToken(user._id);
 
-    res.status(201).json({
-      token,
-      user: { ...user.toJSON(), maliPoints: user.maliPoints },
-    });
+    res.status(201).json({ token, user: user.toJSON() });
   } catch (err) {
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((e) => e.message);
       return res.status(400).json({ message: messages.join(', ') });
+    }
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Phone number already registered' });
     }
     res.status(500).json({ message: 'Server error' });
   }
@@ -37,23 +59,20 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, phone, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    if ((!email && !phone) || !password) {
+      return res.status(400).json({ message: 'Email/phone and password are required' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const query = email ? { email } : { phone };
+    const user = await User.findOne(query).select('+password');
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const token = signToken(user._id);
-
-    res.json({
-      token,
-      user: { ...user.toJSON(), maliPoints: user.maliPoints },
-    });
+    res.json({ token, user: user.toJSON() });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }

@@ -2,45 +2,18 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true,
-  },
-  phone: {
-    type: String,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: 6,
-    select: false,
-  },
-  role: {
-    type: String,
-    enum: ['farmer', 'buyer', 'courier', 'admin'],
-    default: 'buyer',
-  },
-  maliPoints: {
-    type: Number,
-    default: 0,
-  },
+  name: { type: String, required: true, trim: true },
+  phone: { type: String, required: true, unique: true, trim: true },
+  email: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
+  password: { type: String, required: true, minlength: 6, select: false },
+  role: { type: String, enum: ['farmer', 'buyer', 'courier', 'admin'], default: 'buyer' },
   location: {
-    type: String,
-    default: '',
+    lat: { type: Number },
+    lng: { type: Number },
   },
-  referralLink: {
-    type: String,
-    default: '',
-  },
+  sellerTrustLevel: { type: String, enum: ['new', 'verified'], default: 'new' },
+  phoneVerified: { type: Boolean, default: false },
+  maliPoints: { type: Number, default: 0 },
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {
@@ -48,8 +21,8 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, 12);
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (candidate) {
+  return bcrypt.compare(candidate, this.password);
 };
 
 userSchema.methods.toJSON = function () {
