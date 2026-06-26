@@ -63,6 +63,15 @@ router.get('/', async (_req, res) => {
   }
 });
 
+router.get('/mine', protect, async (req, res) => {
+  try {
+    const products = await Product.find({ seller: req.user._id }).sort({ createdAt: -1 });
+    res.json({ products });
+  } catch {
+    res.status(500).json({ message: 'Failed to fetch your products' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -72,15 +81,6 @@ router.get('/:id', async (req, res) => {
     res.json({ product });
   } catch {
     res.status(500).json({ message: 'Failed to fetch product' });
-  }
-});
-
-router.get('/mine', protect, async (req, res) => {
-  try {
-    const products = await Product.find({ seller: req.user._id }).sort({ createdAt: -1 });
-    res.json({ products });
-  } catch {
-    res.status(500).json({ message: 'Failed to fetch your products' });
   }
 });
 
