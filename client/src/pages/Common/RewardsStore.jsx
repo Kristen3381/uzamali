@@ -79,7 +79,7 @@ const RewardsStore = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-primary to-accent p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-primary/90 to-accent/80 backdrop-blur-md p-8 rounded-3xl text-white shadow-xl relative overflow-hidden border border-white/20">
         <div className="absolute top-0 right-0 p-4 opacity-10">
           <Gift className="w-64 h-64 -rotate-12" />
         </div>
@@ -113,7 +113,7 @@ const RewardsStore = () => {
           >
             <div className="p-6 space-y-4 flex-1">
               <div className="flex justify-between items-start">
-                <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-xl group-hover:bg-primary/10 transition-colors">
+                <div className="p-3 glass rounded-xl group-hover:bg-primary/10 transition-colors">
                   {reward.icon}
                 </div>
                 <div className="text-right">
@@ -130,14 +130,14 @@ const RewardsStore = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-100 dark:border-zinc-800">
+            <div className="p-4 bg-white/30 dark:bg-white/5 border-t border-white/10 backdrop-blur-sm">
               <button 
                 onClick={() => handleRedeem(reward)}
                 disabled={maliPoints < reward.cost}
                 className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
                   maliPoints >= reward.cost 
                   ? 'bg-primary text-white hover:bg-accent shadow-md' 
-                  : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-white/20 text-gray-400 cursor-not-allowed backdrop-blur-sm'
                 }`}
               >
                 {maliPoints >= reward.cost ? (
@@ -171,7 +171,7 @@ const RewardsStore = () => {
       )}
 
       {/* Earn More Section */}
-      <div className="bg-primary/5 dark:bg-primary/10 p-8 rounded-3xl border-2 border-dashed border-primary/20 flex flex-col md:flex-row items-center gap-8">
+      <div className="glass p-8 rounded-3xl border border-dashed border-white/30 flex flex-col md:flex-row items-center gap-8">
         <div className="flex-1 space-y-2 text-center md:text-left">
           <h3 className="text-xl font-bold text-primary dark:text-accent">Want more Mali Points?</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -179,8 +179,8 @@ const RewardsStore = () => {
           </p>
         </div>
         <div className="flex gap-4">
-          <button className="btn-primary">View Earning Guide</button>
-          <button className="btn-accent">Refer a Farmer</button>
+          <button onClick={() => alert('📖 Earning Guide\n\nYou earn Mali Points by:\n• Listing agro-waste products\n• Maintaining sustainable farming practices\n• Completing eco-friendly delivery routes\n• Referring other farmers to the platform')} className="btn-primary">View Earning Guide</button>
+          <button onClick={() => alert('👨‍🌾 Refer a Farmer\n\nShare your referral link with other farmers! When they join and list their first product, you both earn 50 Mali Points.\n\nReferral link: https://uzamali.com/ref/' + (user?.name || 'friend'))} className="btn-accent">Refer a Farmer</button>
         </div>
       </div>
     </div>

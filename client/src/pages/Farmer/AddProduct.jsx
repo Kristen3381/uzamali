@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Camera, MapPin, CheckCircle2, Leaf, Zap, HelpCircle } from 'lucide-react';
 import EduPopup from '../../components/UI/EduPopup';
 import { useAuth } from '../../context/AuthContext';
 
 const AddProduct = () => {
   const { addPoints } = useAuth();
-  const [activeEdu, setActiveEdu] = useState(null); // 'waste' or 'sustainable'
+  const fileInputRef = useRef(null);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [activeEdu, setActiveEdu] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -41,12 +43,21 @@ const AddProduct = () => {
     return 20 + (formData.quantity * 2);
   };
 
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + uploadedImages.length > 5) {
+      alert('Maximum 5 images allowed.');
+      return;
+    }
+    setUploadedImages(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const points = calculatePoints();
     if (points > 0) {
       addPoints(points);
-      alert(`Listing created! You earned ${points} Mali Points for your contribution to the circular economy! 🌱`);
+      alert(`Listing created! You earned ${points} Mali Points for your contribution to the circular economy!`);
     } else {
       alert('Listing created successfully! Buyers near you will be notified.');
     }
@@ -121,8 +132,8 @@ const AddProduct = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md border-2 border-primary-light dark:border-zinc-800 overflow-hidden transition-colors">
-          <div className="bg-primary text-white px-6 py-4 flex justify-between items-center">
+        <div className="card shadow-md">
+          <div className="bg-primary/80 backdrop-blur-md text-white px-6 py-4 flex justify-between items-center border-b border-white/20">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-highlight" />
               Product Information
@@ -246,21 +257,51 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md border-2 border-primary-light dark:border-zinc-800 overflow-hidden transition-colors">
-          <div className="bg-primary text-white px-6 py-4">
+        <div className="card shadow-md">
+          <div className="bg-primary/80 backdrop-blur-md text-white px-6 py-4 border-b border-white/20">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Camera className="w-5 h-5 text-highlight" />
               Product Images
             </h2>
           </div>
           <div className="p-6">
-            <div className="border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-white/30 rounded-xl p-8 flex flex-col items-center justify-center bg-white/30 dark:bg-white/5 hover:bg-white/40 dark:hover:bg-white/10 transition-colors cursor-pointer backdrop-blur-sm"
+            >
               <Upload className="w-12 h-12 text-gray-400 mb-4" />
               <p className="text-gray-600 dark:text-gray-400 font-semibold">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-400 mt-2">Max 5 images (JPG, PNG, WEBP)</p>
+              <p className="text-xs text-gray-400 mt-2">Max 5 images ({uploadedImages.length}/5 uploaded)</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageUpload}
+              />
             </div>
+            {uploadedImages.length > 0 && (
+              <div className="mt-4 flex gap-2 flex-wrap">
+                {uploadedImages.map((src, i) => (
+                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/20">
+                    <img src={src} alt={`Upload ${i+1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        URL.revokeObjectURL(src);
+                        setUploadedImages(prev => prev.filter((_, idx) => idx !== i));
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-bl-lg hover:bg-red-600"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             
-            <div className="mt-8 flex items-center gap-3 bg-primary-light dark:bg-primary/10 p-4 rounded-lg border-2 border-primary/10">
+            <div className="mt-8 flex items-center gap-3 glass p-4 rounded-lg border border-white/20">
               <input 
                 type="checkbox" 
                 id="sustainable" 

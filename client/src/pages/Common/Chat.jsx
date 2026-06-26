@@ -16,16 +16,16 @@ const Chat = () => {
   ];
 
   return (
-    <div className="h-[calc(100vh-120px)] flex bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary/20 shadow-sm overflow-hidden transition-colors duration-300">
+    <div className="h-[calc(100vh-120px)] flex glass rounded-xl shadow-sm overflow-hidden">
       {/* Chat List */}
-      <div className="w-full md:w-80 border-r border-gray-100 dark:border-zinc-800 flex flex-col">
-        <div className="p-4 border-b border-gray-100 dark:border-zinc-800">
+      <div className="w-full md:w-80 border-r border-white/10 flex flex-col">
+        <div className="p-4 border-b border-white/10">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input 
               type="text" 
               placeholder="Search chats..." 
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-zinc-800 border-none rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary"
+              className="w-full pl-9 pr-4 py-2 input-field border-none rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
@@ -35,7 +35,7 @@ const Chat = () => {
               key={chat.id}
               onClick={() => setActiveChat(chat.id)}
               className={`p-4 flex items-center gap-3 cursor-pointer transition-colors ${
-                activeChat === chat.id ? 'bg-primary/10 dark:bg-primary/20' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+                activeChat === chat.id ? 'bg-accent/10 backdrop-blur-sm' : 'hover:bg-white/20 dark:hover:bg-white/5'
               }`}
             >
               <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white font-bold shadow-sm">
@@ -54,9 +54,8 @@ const Chat = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="hidden md:flex flex-1 flex-col bg-gray-50/30 dark:bg-black/20">
-        {/* Header */}
-        <div className="p-4 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center transition-colors">
+      <div className="hidden md:flex flex-1 flex-col">
+        <div className="p-4 glass border-b border-white/10 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold">
               {chats[activeChat].avatar}
@@ -70,10 +69,16 @@ const Chat = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 text-primary dark:text-accent hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+            <button
+              onClick={() => alert(`📞 Initiating call with ${chats[activeChat].name}...`)}
+              className="p-2 text-primary dark:text-accent hover:bg-white/20 rounded-full transition-colors"
+            >
               <Phone className="w-5 h-5" />
             </button>
-            <button className="p-2 text-primary dark:text-accent hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+            <button
+              onClick={() => alert(`📍 Live location sharing with ${chats[activeChat].name} coming soon.`)}
+              className="p-2 text-primary dark:text-accent hover:bg-white/20 rounded-full transition-colors"
+            >
               <MapPin className="w-5 h-5" />
             </button>
           </div>
@@ -89,7 +94,7 @@ const Chat = () => {
               <div className={`max-w-[70%] p-3 rounded-2xl shadow-sm ${
                 msg.sender === 'me' 
                 ? 'bg-primary text-white rounded-tr-none' 
-                : 'bg-white dark:bg-zinc-800 dark:text-white rounded-tl-none border border-gray-100 dark:border-zinc-700'
+                : 'glass rounded-tl-none'
               }`}>
                 <p className="text-sm">{msg.text}</p>
                 <p className={`text-[10px] mt-1 text-right ${msg.sender === 'me' ? 'text-primary-light/70' : 'text-gray-400'}`}>
@@ -101,7 +106,7 @@ const Chat = () => {
         </div>
 
         {/* Input */}
-        <div className="p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 transition-colors">
+        <div className="p-4 glass border-t border-white/10">
           <form 
             onSubmit={(e) => { e.preventDefault(); setMessage(''); }}
             className="flex items-center gap-3"
@@ -109,7 +114,7 @@ const Chat = () => {
             <input 
               type="text" 
               placeholder="Type your message..." 
-              className="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded-xl px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-primary transition-colors"
+              className="flex-1 input-field border-none rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />

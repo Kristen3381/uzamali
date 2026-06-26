@@ -16,7 +16,9 @@ const PricingTool = () => {
 
   const getSuggestedPrice = () => {
     const data = marketRates[crop] || { rate: 0, trend: 'stable' };
-    return data.rate * quantity;
+    const baseRate = data.rate || 0;
+    const unitMultiplier = unit === '90kg bag' ? 1 : unit === 'crate' ? 0.8 : 1;
+    return Math.round(baseRate * quantity * unitMultiplier);
   };
 
   return (
@@ -27,8 +29,8 @@ const PricingTool = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-md space-y-6 transition-colors duration-300">
-          <div className="flex items-center gap-2 text-primary dark:text-accent font-bold border-b border-gray-100 dark:border-zinc-800 pb-4">
+        <div className="card p-6 shadow-md space-y-6">
+          <div className="flex items-center gap-2 text-primary dark:text-accent font-bold border-b border-white/20 pb-4">
             <Calculator className="w-5 h-5" />
             Price Calculator
           </div>
@@ -72,14 +74,14 @@ const PricingTool = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-primary-light dark:bg-primary/10 rounded-lg text-center transition-colors">
+          <div className="p-4 glass rounded-lg text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold mb-1">Suggested Market Price</p>
             <p className="text-4xl font-black text-primary dark:text-accent transition-colors">KES {getSuggestedPrice().toLocaleString()}</p>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-md transition-colors duration-300">
+          <div className="card p-6 shadow-md">
             <h3 className="font-bold text-primary dark:text-accent mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-accent" />
               Market Trends
@@ -103,9 +105,9 @@ const PricingTool = () => {
             </div>
           </div>
 
-          <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 flex gap-3 transition-colors">
+          <div className="glass p-4 rounded-xl border border-highlight/30 flex gap-3">
             <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-500 shrink-0" />
-            <p className="text-xs text-yellow-800 dark:text-yellow-400 leading-relaxed">
+            <p className="text-xs text-gray-700 dark:text-yellow-400 leading-relaxed">
               <strong>Tip:</strong> Prices are estimates based on regional averages. For the best sales, consider the "Sustainable" badge to attract premium buyers!
             </p>
           </div>

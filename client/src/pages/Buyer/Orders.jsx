@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Package, Truck, CheckCircle, MapPin, Search } from 'lucide-react';
 
 const Orders = () => {
+  const [searchTerm, setSearchTerm] = useState('');
   const orders = [
     {
       id: 'ORD-7721-XA',
@@ -37,18 +38,25 @@ const Orders = () => {
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input 
-            type="text" 
-            placeholder="Search orders..." 
+          <input
+            type="text"
+            placeholder="Search orders..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 pr-4 py-2 border-2 border-primary-light dark:border-zinc-700 dark:bg-zinc-800 dark:text-white rounded-md focus:border-primary outline-none transition-colors"
           />
         </div>
       </div>
 
       <div className="space-y-6">
-        {orders.map((order) => (
-          <div key={order.id} className="bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
-            <div className="bg-gray-50 dark:bg-zinc-800/50 px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
+        {orders
+          .filter(o =>
+            o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            o.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          )
+          .map((order) => (
+          <div key={order.id} className="card overflow-hidden">
+            <div className="bg-white/30 dark:bg-white/5 px-6 py-4 border-b border-white/20 flex flex-col md:flex-row justify-between md:items-center gap-4 backdrop-blur-sm">
               <div className="flex flex-wrap gap-6 text-sm font-semibold">
                 <div>
                   <p className="text-gray-400 dark:text-gray-500 uppercase text-[10px]">Order Date</p>
@@ -75,9 +83,9 @@ const Orders = () => {
                 <div className="space-y-4">
                   <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Items Ordered</h4>
                   {order.items.map((item, i) => (
-                    <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-zinc-800 last:border-0">
+                    <div key={i} className="flex justify-between items-center py-2 border-b border-white/10 last:border-0">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary-light dark:bg-primary/10 rounded-md">
+                        <div className="p-2 glass rounded-md">
                           <Package className="w-5 h-5 text-primary dark:text-accent" />
                         </div>
                         <div>
@@ -90,7 +98,7 @@ const Orders = () => {
                   ))}
                 </div>
 
-                <div className="bg-primary-light/30 dark:bg-primary/5 p-4 rounded-xl space-y-4 transition-colors">
+                <div className="glass p-4 rounded-xl space-y-4">
                   <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Tracking Info</h4>
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center">
@@ -106,7 +114,10 @@ const Orders = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="w-full py-2 bg-white dark:bg-zinc-800 text-primary dark:text-accent border border-primary dark:border-primary/50 font-bold rounded-md text-xs hover:bg-primary hover:text-white transition-all">
+                  <button
+                    onClick={() => alert(`📍 Tracking Map\n\nOrder: ${order.id}\nStatus: ${order.deliveryStatus}\nLocation: ${order.location}\n\nLive tracking will be available once the courier starts the delivery.`)}
+                    className="w-full py-2 glass text-primary dark:text-accent font-bold rounded-md text-xs hover:bg-primary hover:text-white transition-all"
+                  >
                     View Tracking Map
                   </button>
                 </div>

@@ -6,8 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 const Cart = () => {
   const { maliPoints } = useAuth();
   const [redeemApplied, setRedeemApplied] = useState(false);
-
-  const cartItems = [
+  const [cartItems, setCartItems] = useState([
     {
       id: 1,
       name: 'Fresh Red Tomatoes',
@@ -26,7 +25,21 @@ const Cart = () => {
       farmer: 'Murang\'a Cooperative',
       image: 'https://images.unsplash.com/photo-1523038823543-30f00b3f61e8?auto=format&fit=crop&q=80&w=200'
     }
-  ];
+  ]);
+
+  const updateQuantity = (id, delta) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+          : item
+      )
+    );
+  };
+
+  const removeItem = (id) => {
+    setCartItems(prev => prev.filter(item => item.id !== id));
+  };
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const deliveryFee = 250;
@@ -45,21 +58,21 @@ const Cart = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
-            <div key={item.id} className="bg-white dark:bg-zinc-900 p-4 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm flex gap-4 transition-colors">
+            <div key={item.id} className="card p-4 flex gap-4">
               <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
               <div className="flex-1">
                 <div className="flex justify-between">
                   <h3 className="font-bold text-primary dark:text-accent">{item.name}</h3>
-                  <button className="text-red-400 hover:text-red-600">
+                  <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Sold by: <span className="font-bold">{item.farmer}</span></p>
                 <div className="flex justify-between items-end">
                   <div className="flex items-center gap-3">
-                    <button className="w-8 h-8 border border-gray-200 dark:border-zinc-700 rounded-md flex items-center justify-center font-bold dark:text-white">-</button>
+                    <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 glass rounded-md flex items-center justify-center font-bold dark:text-white">-</button>
                     <span className="font-bold dark:text-white">{item.quantity}</span>
-                    <button className="w-8 h-8 border border-gray-200 dark:border-zinc-700 rounded-md flex items-center justify-center font-bold dark:text-white">+</button>
+                    <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 glass rounded-md flex items-center justify-center font-bold dark:text-white">+</button>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">KES {item.price} / {item.unit}</p>
@@ -71,7 +84,7 @@ const Cart = () => {
           ))}
 
           {/* Mali Points Redemption */}
-          <div className="bg-gradient-to-r from-primary to-accent p-6 rounded-2xl text-white shadow-lg overflow-hidden relative">
+          <div className="bg-gradient-to-br from-primary/80 to-accent/80 backdrop-blur-md p-6 rounded-2xl text-white shadow-lg overflow-hidden relative border border-white/20">
             <Gift className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 rotate-12" />
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
@@ -111,7 +124,7 @@ const Cart = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary shadow-md transition-colors">
+          <div className="card p-6 shadow-md">
             <h3 className="text-xl font-bold text-primary dark:text-accent mb-6">Order Summary</h3>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -130,14 +143,14 @@ const Cart = () => {
                   <span>- KES {discount}</span>
                 </div>
               )}
-              <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex justify-between text-xl">
+              <div className="border-t border-white/20 pt-4 flex justify-between text-xl">
                 <span className="font-bold text-primary dark:text-accent">Total</span>
                 <span className="font-black text-primary dark:text-accent">KES {(subtotal + deliveryFee - discount).toLocaleString()}</span>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-primary-light dark:bg-primary/10 rounded-lg border border-primary/20 flex gap-3">
+              <div className="p-4 glass rounded-lg border border-white/20 flex gap-3">
                 <Smartphone className="w-6 h-6 text-primary dark:text-accent shrink-0" />
                 <div>
                   <p className="text-xs font-bold text-primary dark:text-accent uppercase">Payment Method</p>
@@ -145,7 +158,16 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="w-full btn-highlight py-4 text-xl flex items-center justify-center gap-3 shadow-lg">
+              <button
+                onClick={() => {
+                  if (cartItems.length === 0) {
+                    alert('Your cart is empty. Add some items before checking out.');
+                    return;
+                  }
+                  alert(`📱 M-Pesa STK Push sent to your phone!\n\nTotal: KES ${(subtotal + deliveryFee - discount).toLocaleString()}\n\nPlease check your phone and enter your M-Pesa PIN to complete the transaction.`);
+                }}
+                className="w-full btn-highlight py-4 text-xl flex items-center justify-center gap-3 shadow-lg"
+              >
                 <Smartphone className="w-6 h-6" />
                 Pay via M-Pesa
               </button>

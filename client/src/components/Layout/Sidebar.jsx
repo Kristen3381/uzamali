@@ -12,11 +12,17 @@ import {
   History,
   MessageSquare,
   Gift,
-  X
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ collapsed, onToggleCollapse }) => {
   const { user } = useAuth();
+
+  const handleWasteClick = (e) => {
+    e.preventDefault();
+    alert('♻️ Waste Exchange coming soon! Farmers will be able to list and trade agro-waste for biogas, briquettes, and silage.');
+  };
 
   const farmerLinks = [
     { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -24,7 +30,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
     { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
-    { to: '#', icon: Trash2, label: 'Waste Exchange' },
+    { to: '#', icon: Trash2, label: 'Waste Exchange', onClick: handleWasteClick },
   ];
 
   const buyerLinks = [
@@ -33,7 +39,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/messages', icon: MessageSquare, label: 'Courier Chat' },
     { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
-    { to: '#', icon: Trash2, label: 'Waste Exchange' },
+    { to: '#', icon: Trash2, label: 'Waste Exchange', onClick: handleWasteClick },
   ];
 
   const courierLinks = [
@@ -68,36 +74,50 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside className={`
-      fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 shadow-xl transform transition-transform duration-300 ease-in-out
-      md:relative md:translate-x-0 md:shadow-none
-      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      hidden md:flex flex-col glass-sidebar
+      transition-all duration-300 ease-in-out
+      ${collapsed ? 'w-20' : 'w-64'}
     `}>
       <div className="flex flex-col h-full">
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between p-4 md:hidden border-b border-gray-100 dark:border-zinc-800">
-          <span className="text-xl font-bold text-primary dark:text-accent">Menu</span>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-primary">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="py-6 overflow-y-auto">
-          <nav className="flex flex-col">
-            {getLinks().map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) => (isActive ? 'sidebar-link-active' : 'sidebar-link-inactive')}
-                onClick={() => {
-                  if (window.innerWidth < 768) onClose();
-                }}
-              >
-                <link.icon className="w-5 h-5" />
-                <span>{link.label}</span>
-              </NavLink>
-            ))}
+        <div className="flex-1 py-6 overflow-y-auto">
+          <nav className="flex flex-col items-stretch">
+            {getLinks().map((link) =>
+              link.onClick ? (
+                <button
+                  key={link.to}
+                  title={collapsed ? link.label : undefined}
+                  onClick={link.onClick}
+                  className={`sidebar-link-inactive w-full text-left flex items-center gap-3 ${collapsed ? 'justify-center' : 'justify-start'}`}
+                >
+                  <link.icon className="w-5 h-5 shrink-0" />
+                  <span className={`${collapsed ? 'hidden' : ''}`}>{link.label}</span>
+                </button>
+              ) : (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  title={collapsed ? link.label : undefined}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 ${collapsed ? 'justify-center' : 'justify-start'} ${
+                      isActive ? 'sidebar-link-active' : 'sidebar-link-inactive'
+                    }`
+                  }
+                >
+                  <link.icon className="w-5 h-5 shrink-0" />
+                  <span className={`${collapsed ? 'hidden' : ''}`}>{link.label}</span>
+                </NavLink>
+              )
+            )}
           </nav>
         </div>
+
+        <button
+          onClick={onToggleCollapse}
+          className="flex items-center justify-center p-4 border-t border-white/20 text-gray-400 hover:text-primary dark:hover:text-accent transition-colors"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+        </button>
       </div>
     </aside>
   );

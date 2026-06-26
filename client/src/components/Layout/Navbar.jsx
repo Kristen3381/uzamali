@@ -8,12 +8,12 @@ const Navbar = ({ onMenuClick }) => {
   const { user, logout, maliPoints } = useAuth();
 
   return (
-    <nav className="bg-primary text-white shadow-lg px-4 py-3 flex items-center justify-between sticky top-0 z-50 transition-colors">
+    <nav className="glass  text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-4">
         <button onClick={onMenuClick} className="md:hidden hover:text-highlight transition-colors">
           <Menu className="w-6 h-6" />
         </button>
-        <Link to="/" className="text-2xl font-bold tracking-tight">
+        <Link to="/" className="text-2xl font-bold tracking-tight text-primary dark:text-white">
           Uza<span className="text-highlight">Mali</span>
         </Link>
       </div>
@@ -22,7 +22,7 @@ const Navbar = ({ onMenuClick }) => {
         <ThemeToggle />
         
         {user && (
-          <Link to="/rewards" className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-all border border-white/10 group">
+          <Link to="/rewards" className="hidden sm:flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-all border border-white/20 backdrop-blur-sm group">
             <Leaf className="w-4 h-4 text-highlight group-hover:scale-110 transition-transform" />
             <span className="text-sm font-black tracking-tight">{maliPoints} <span className="font-medium opacity-80 ml-0.5">pts</span></span>
           </Link>
@@ -32,7 +32,7 @@ const Navbar = ({ onMenuClick }) => {
           <>
             <Link to="/messages" className="hover:text-highlight transition-colors relative" title="Courier Chat">
               <MessageSquare className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-red-500 w-2.5 h-2.5 rounded-full border-2 border-primary"></span>
+              <span className="absolute -top-1 -right-1 bg-red-500 w-2.5 h-2.5 rounded-full border-2 border-white/50"></span>
             </Link>
             <Link to="/cart" className="relative hover:text-highlight transition-colors">
               <ShoppingCart className="w-6 h-6" />

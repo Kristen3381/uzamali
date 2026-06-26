@@ -8,11 +8,11 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1E5631', // dark forest green
-          light: '#D5F5E3',   // light background green
+          DEFAULT: '#2B6B3C',
+          light: '#E8F5E9',
         },
-        accent: '#27AE60',    // mid green
-        highlight: '#F1C40F', // yellow - for Buy Now and Accept Delivery
+        accent: '#2ECC71',
+        highlight: '#F1C40F',
       },
     },
   },

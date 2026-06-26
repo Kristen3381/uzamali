@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ShoppingCart, Zap, MapPin, BookOpen } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Zap, MapPin, BookOpen, CheckCircle } from 'lucide-react';
 import EduPopup from '../../components/UI/EduPopup';
 
 const ProduceMarket = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
   const [isEduOpen, setIsEduOpen] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(null);
 
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Legumes', 'Tubers', 'Dairy', 'Agro-waste'];
 
@@ -83,10 +85,20 @@ const ProduceMarket = () => {
     }
   ];
 
-  const filteredProducts = products.filter(p => 
-    (activeCategory === 'All' || p.category === activeCategory) &&
-    (p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredProducts = products
+    .filter(p => 
+      (activeCategory === 'All' || p.category === activeCategory) &&
+      (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       p.location.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low': return a.price - b.price;
+        case 'price-high': return b.price - a.price;
+        default: return 0;
+      }
+    });
 
   const buyerEduContent = (
     <div className="space-y-4">
@@ -118,13 +130,13 @@ const ProduceMarket = () => {
       />
 
       {/* Search and Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between glass p-4 rounded-lg shadow-sm">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input 
             type="text" 
             placeholder="Search produce..." 
-            className="w-full pl-10 pr-4 py-2 border-2 border-primary-light dark:border-zinc-700 dark:bg-zinc-800 dark:text-white rounded-md focus:outline-none focus:border-primary transition-colors"
+            className="w-full pl-10 pr-4 py-2 input-field rounded-md focus:outline-none focus:border-primary transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -132,11 +144,14 @@ const ProduceMarket = () => {
         
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
           <Filter className="text-primary dark:text-accent w-5 h-5 shrink-0" />
-          <select className="bg-white dark:bg-zinc-800 dark:text-white border-2 border-primary-light dark:border-zinc-700 rounded-md px-3 py-2 outline-none focus:border-primary shrink-0 transition-colors">
-            <option>Sort by: Newest First</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Nearest First</option>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="glass rounded-md px-3 py-2 outline-none focus:border-primary shrink-0"
+          >
+            <option value="newest">Sort by: Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
           </select>
         </div>
       </div>
@@ -150,7 +165,7 @@ const ProduceMarket = () => {
             className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all ${
               activeCategory === cat 
               ? 'bg-primary text-white shadow-md' 
-              : 'bg-white dark:bg-zinc-800 text-primary dark:text-accent border-2 border-primary dark:border-primary/50 hover:bg-primary-light dark:hover:bg-primary/20'
+              : 'glass text-primary dark:text-accent hover:bg-white/40 dark:hover:bg-white/10'
             }`}
           >
             {cat}
@@ -194,11 +209,27 @@ const ProduceMarket = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-2 mt-auto">
-                <button className="flex items-center justify-center gap-1 py-2 px-2 border-2 border-primary text-primary dark:text-accent font-bold rounded-md hover:bg-primary-light dark:hover:bg-primary/10 transition-colors text-sm">
-                  <ShoppingCart className="w-4 h-4" />
-                  Cart
+                <button
+                  onClick={() => {
+                    setAddedToCart(product.id);
+                    setTimeout(() => setAddedToCart(null), 2000);
+                  }}
+                  className={`flex items-center justify-center gap-1 py-2 px-2 border-2 font-bold rounded-md text-sm transition-all ${
+                    addedToCart === product.id
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-primary text-primary dark:text-accent hover:bg-primary-light dark:hover:bg-primary/10'
+                  }`}
+                >
+                  {addedToCart === product.id ? (
+                    <><CheckCircle className="w-4 h-4" /> Added</>
+                  ) : (
+                    <><ShoppingCart className="w-4 h-4" /> Cart</>
+                  )}
                 </button>
-                <button className="btn-highlight flex items-center justify-center gap-1 py-2 px-2 text-sm">
+                <button
+                  onClick={() => alert(`🛒 Proceeding to checkout for ${product.name} - KES ${product.price}/${product.unit}`)}
+                  className="btn-highlight flex items-center justify-center gap-1 py-2 px-2 text-sm"
+                >
                   <Zap className="w-4 h-4 fill-current" />
                   Buy Now
                 </button>

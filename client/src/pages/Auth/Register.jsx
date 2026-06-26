@@ -34,8 +34,8 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light dark:bg-zinc-950 p-4 transition-colors duration-300">
-      <div className="max-w-2xl w-full bg-white dark:bg-zinc-900 rounded-xl shadow-xl overflow-hidden border-2 border-primary transition-colors">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full glass rounded-xl shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-primary dark:text-accent">Uza<span className="text-highlight">Mali</span></h1>
@@ -94,13 +94,13 @@ const Register = () => {
                     <div 
                       key={role.id}
                       onClick={() => handleRoleSelect(role.id)}
-                      className={`flex items-center gap-4 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      className={`flex items-center gap-4 p-4 rounded-lg cursor-pointer transition-all backdrop-blur-sm ${
                         formData.role === role.id 
-                        ? 'border-accent bg-accent bg-opacity-10 dark:bg-accent/20 shadow-md' 
-                        : 'border-gray-200 dark:border-zinc-800 hover:border-accent hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+                        ? 'border-2 border-accent bg-accent/10 shadow-md' 
+                        : 'border border-white/30 dark:border-white/10 hover:border-accent bg-white/30 dark:bg-white/5'
                       }`}
                     >
-                      <div className={`p-2 rounded-full ${formData.role === role.id ? 'bg-accent text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400'}`}>
+                      <div className={`p-2 rounded-full ${formData.role === role.id ? 'bg-accent text-white' : 'bg-white/50 dark:bg-white/10 text-gray-500 dark:text-gray-400'}`}>
                         <role.icon className="w-6 h-6" />
                       </div>
                       <div>

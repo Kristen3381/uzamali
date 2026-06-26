@@ -8,11 +8,12 @@ import {
   ArrowRight,
   Leaf
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const FarmerDashboard = () => {
   const { maliPoints } = useAuth();
+  const navigate = useNavigate();
   
   const stats = [
     { label: 'Total Listings', value: '12', icon: Package, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
@@ -35,7 +36,7 @@ const FarmerDashboard = () => {
           <p className="text-gray-600 dark:text-gray-400">Overview of your produce listings and sales performance.</p>
         </div>
         <div className="flex gap-4">
-          <div className="bg-primary/10 dark:bg-accent/10 border-2 border-primary dark:border-accent p-2 px-4 rounded-xl flex items-center gap-2 shadow-sm">
+          <div className="glass p-2 px-4 rounded-xl flex items-center gap-2 shadow-sm">
             <Leaf className="w-5 h-5 text-primary dark:text-accent fill-current" />
             <div className="text-left">
               <p className="text-[10px] font-bold text-gray-500 uppercase leading-none mb-1">Mali Points</p>
@@ -52,7 +53,7 @@ const FarmerDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-colors">
+          <div key={stat.label} className="card flex items-center gap-4 p-6">
             <div className={`p-3 rounded-lg ${stat.bg} ${stat.color}`}>
               <stat.icon className="w-6 h-6" />
             </div>
@@ -66,16 +67,16 @@ const FarmerDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Orders Table */}
-        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
-          <div className="p-6 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
+        <div className="lg:col-span-2 card overflow-hidden">
+          <div className="p-6 border-b border-white/20 flex items-center justify-between">
             <h2 className="text-xl font-bold text-primary dark:text-accent">Recent Orders</h2>
-            <button className="text-accent hover:underline text-sm font-bold flex items-center gap-1">
+            <button onClick={() => navigate('/orders')} className="text-accent hover:underline text-sm font-bold flex items-center gap-1">
               View All <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
+              <thead className="bg-white/30 dark:bg-white/5 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
                 <tr>
                   <th className="px-6 py-4">Order ID</th>
                   <th className="px-6 py-4">Product</th>
@@ -84,9 +85,9 @@ const FarmerDashboard = () => {
                   <th className="px-6 py-4">Amount</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
+              <tbody className="divide-y divide-white/10">
                 {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                  <tr key={order.id} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 font-mono text-sm dark:text-gray-300">{order.id}</td>
                     <td className="px-6 py-4 font-semibold text-primary dark:text-accent">{order.product}</td>
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{order.buyer}</td>
@@ -108,7 +109,7 @@ const FarmerDashboard = () => {
         </div>
 
         {/* Inventory Summary */}
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary-light dark:border-zinc-800 shadow-sm p-6 transition-colors">
+        <div className="card p-6">
           <h2 className="text-xl font-bold text-primary dark:text-accent mb-6">Inventory Status</h2>
           <div className="space-y-6">
             <div>
@@ -116,7 +117,7 @@ const FarmerDashboard = () => {
                 <span className="font-semibold text-gray-600 dark:text-gray-400">Tomatoes (kg)</span>
                 <span className="text-primary dark:text-accent font-bold">85 / 100</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-white/30 dark:bg-white/10 h-2 rounded-full overflow-hidden backdrop-blur-sm">
                 <div className="bg-accent h-full w-[85%]"></div>
               </div>
             </div>
@@ -125,7 +126,7 @@ const FarmerDashboard = () => {
                 <span className="font-semibold text-gray-600 dark:text-gray-400">Maize (90kg Bags)</span>
                 <span className="text-primary dark:text-accent font-bold">12 / 50</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-white/30 dark:bg-white/10 h-2 rounded-full overflow-hidden backdrop-blur-sm">
                 <div className="bg-primary h-full w-[24%]"></div>
               </div>
             </div>
@@ -134,13 +135,13 @@ const FarmerDashboard = () => {
                 <span className="font-semibold text-gray-600 dark:text-gray-400">Avocados (Pieces)</span>
                 <span className="text-primary dark:text-accent font-bold">420 / 500</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-white/30 dark:bg-white/10 h-2 rounded-full overflow-hidden backdrop-blur-sm">
                 <div className="bg-accent h-full w-[84%]"></div>
               </div>
             </div>
           </div>
           
-          <div className="mt-8 p-4 bg-primary-light dark:bg-primary/10 rounded-lg border border-primary border-opacity-20">
+          <div className="mt-8 p-4 glass rounded-lg border border-white/20">
             <h4 className="font-bold text-primary dark:text-accent text-sm mb-2">Insights</h4>
             <p className="text-xs text-gray-700 dark:text-gray-400">
               Tomatoes are selling fast! Consider updating your prices or increasing supply based on current demand in your area.

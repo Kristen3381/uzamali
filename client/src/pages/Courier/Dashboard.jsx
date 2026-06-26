@@ -3,6 +3,7 @@ import { Truck, MapPin, CheckCircle, Clock, Navigation, Phone, Info } from 'luci
 
 const CourierDashboard = () => {
   const [activeTab, setActiveTab] = useState('Available');
+  const [notifyMsg, setNotifyMsg] = useState(null);
 
   const availableJobs = [
     {
@@ -36,9 +37,14 @@ const CourierDashboard = () => {
     }
   ];
 
+  const showNotify = (msg) => {
+    setNotifyMsg(msg);
+    setTimeout(() => setNotifyMsg(null), 3000);
+  };
+
   const JobCard = ({ job, isAvailable }) => (
     <div className="card mb-4 overflow-hidden dark:border-primary/30">
-      <div className="p-4 bg-gray-50 dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-700 flex justify-between items-center transition-colors">
+      <div className="p-4 bg-white/30 dark:bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-sm">
         <span className="font-mono text-xs font-bold text-gray-500 dark:text-gray-400">Order ID: {job.id}</span>
         {isAvailable ? (
           <span className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">pending</span>
@@ -57,7 +63,7 @@ const CourierDashboard = () => {
             <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <MapPin className="w-3 h-3 text-green-600 dark:text-green-400" />
             </div>
-            <div className="w-0.5 h-8 bg-gray-200 dark:bg-zinc-800 my-1"></div>
+            <div className="w-0.5 h-8 bg-white/30 my-1"></div>
             <div className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
               <MapPin className="w-3 h-3 text-orange-600 dark:text-orange-400" />
             </div>
@@ -74,7 +80,7 @@ const CourierDashboard = () => {
           </div>
         </div>
 
-        <div className="p-3 bg-primary-light dark:bg-primary/10 rounded-lg flex justify-between items-center transition-colors">
+        <div className="p-3 glass rounded-lg flex justify-between items-center">
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Product: <span className="font-bold dark:text-white">{job.product}</span></p>
             {isAvailable && <p className="text-xs text-gray-500 dark:text-gray-400">Distance: <span className="font-bold dark:text-white">{job.distance}</span></p>}
@@ -83,7 +89,7 @@ const CourierDashboard = () => {
             {isAvailable ? (
               <p className="text-lg font-black text-primary dark:text-accent">{job.fee}</p>
             ) : (
-              <button className="p-2 bg-white dark:bg-zinc-800 rounded-full text-accent shadow-sm border border-accent/20">
+              <button onClick={() => showNotify(`📞 Calling buyer at ${job.buyerPhone}...`)} className="p-2 glass rounded-full text-accent shadow-sm">
                 <Phone className="w-4 h-4" />
               </button>
             )}
@@ -91,17 +97,26 @@ const CourierDashboard = () => {
         </div>
 
         {isAvailable ? (
-          <button className="w-full btn-highlight flex items-center justify-center gap-2 py-3">
+          <button
+            onClick={() => showNotify(`✅ Job ${job.id} accepted! Head to ${job.pickup} to pick up the goods.`)}
+            className="w-full btn-highlight flex items-center justify-center gap-2 py-3"
+          >
             <Truck className="w-5 h-5" />
             Accept Delivery
           </button>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <button className="flex items-center justify-center gap-2 py-3 border-2 border-primary text-primary dark:text-accent font-bold rounded-md text-sm hover:bg-primary/10 transition-colors">
+            <button
+              onClick={() => showNotify(`📍 Opening navigation to ${job.pickup}...`)}
+              className="flex items-center justify-center gap-2 py-3 border-2 border-primary text-primary dark:text-accent font-bold rounded-md text-sm hover:bg-primary/10 transition-colors"
+            >
               <Navigation className="w-4 h-4" />
               Navigate
             </button>
-            <button className="btn-accent flex items-center justify-center gap-2 py-3 text-sm">
+            <button
+              onClick={() => showNotify(`✅ Delivery marked as delivered! Order ${job.id} complete.`)}
+              className="btn-accent flex items-center justify-center gap-2 py-3 text-sm"
+            >
               <CheckCircle className="w-4 h-4" />
               Mark Delivered
             </button>
@@ -118,7 +133,7 @@ const CourierDashboard = () => {
         <p className="text-gray-600 dark:text-gray-400">Find and manage your delivery jobs.</p>
       </div>
 
-      <div className="flex bg-white dark:bg-zinc-900 rounded-lg p-1 shadow-sm border border-gray-200 dark:border-zinc-800 transition-colors">
+      <div className="flex glass rounded-lg p-1 shadow-sm">
         <button 
           onClick={() => setActiveTab('Available')}
           className={`flex-1 py-3 font-bold rounded-md transition-all ${
@@ -142,7 +157,7 @@ const CourierDashboard = () => {
           availableJobs.length > 0 ? (
             availableJobs.map(job => <JobCard key={job.id} job={job} isAvailable={true} />)
           ) : (
-            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-800 transition-colors">
+            <div className="text-center py-20 card border-dashed">
               <Info className="w-12 h-12 text-gray-300 dark:text-zinc-700 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400 font-semibold">No available jobs in your area.</p>
             </div>
@@ -151,7 +166,7 @@ const CourierDashboard = () => {
           activeJobs.length > 0 ? (
             activeJobs.map(job => <JobCard key={job.id} job={job} isAvailable={false} />)
           ) : (
-            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-800 transition-colors">
+            <div className="text-center py-20 card border-dashed">
               <Truck className="w-12 h-12 text-gray-300 dark:text-zinc-700 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400 font-semibold">You don't have any active deliveries.</p>
             </div>
@@ -163,24 +178,42 @@ const CourierDashboard = () => {
       <div className="h-20 md:hidden"></div>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 flex justify-around items-center p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors">
-        <button className="text-primary dark:text-accent flex flex-col items-center gap-1">
+      <div className="fixed bottom-0 left-0 right-0 glass border-t border-white/20 flex justify-around items-center p-4 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <button
+          onClick={() => setActiveTab('Active')}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'Active' ? 'text-primary dark:text-accent' : 'text-gray-400 dark:text-zinc-500'}`}
+        >
           <Truck className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Home</span>
+          <span className="text-[10px] font-bold">Jobs</span>
         </button>
-        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
+        <button
+          onClick={() => showNotify('📋 Delivery history coming soon.')}
+          className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1"
+        >
           <Clock className="w-6 h-6" />
           <span className="text-[10px] font-bold">History</span>
         </button>
-        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
+        <button
+          onClick={() => showNotify('🗺️ Maps and navigation will be available when you accept a delivery job.')}
+          className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1"
+        >
           <Navigation className="w-6 h-6" />
           <span className="text-[10px] font-bold">Maps</span>
         </button>
-        <button className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1">
+        <button
+          onClick={() => showNotify('👤 Profile page coming soon.')}
+          className="text-gray-400 dark:text-zinc-500 flex flex-col items-center gap-1"
+        >
           <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-zinc-800"></div>
           <span className="text-[10px] font-bold">Profile</span>
         </button>
       </div>
+
+      {notifyMsg && (
+        <div className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-primary/90 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-xl border border-white/20 whitespace-nowrap">
+          <p className="text-sm font-semibold">{notifyMsg}</p>
+        </div>
+      )}
     </div>
   );
 };

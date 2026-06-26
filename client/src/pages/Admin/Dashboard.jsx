@@ -43,29 +43,27 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-primary">Admin Analytics</h1>
-        <p className="text-gray-600">Overview of platform performance and growth metrics.</p>
+        <h1 className="text-3xl font-bold text-primary dark:text-accent">Admin Analytics</h1>
+        <p className="text-gray-600 dark:text-gray-400">Overview of platform performance and growth metrics.</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white p-6 rounded-xl border-2 border-primary-light shadow-sm flex items-center gap-4">
+          <div key={stat.label} className="card flex items-center gap-4 p-6">
             <div className={`p-3 rounded-lg ${stat.bg} ${stat.color}`}>
               <stat.icon className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-semibold">{stat.label}</p>
-              <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold">{stat.label}</p>
+              <p className="text-2xl font-bold text-gray-800 dark:text-white">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Sales Chart */}
-        <div className="bg-white p-6 rounded-xl border-2 border-primary-light shadow-sm">
-          <h2 className="text-xl font-bold text-primary mb-6">Sales Growth (Monthly)</h2>
+        <div className="card p-6">
+          <h2 className="text-xl font-bold text-primary dark:text-accent mb-6">Sales Growth (Monthly)</h2>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesData}>
@@ -79,9 +77,8 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Category Distribution */}
-        <div className="bg-white p-6 rounded-xl border-2 border-primary-light shadow-sm">
-          <h2 className="text-xl font-bold text-primary mb-6">Top Selling Categories</h2>
+        <div className="card p-6">
+          <h2 className="text-xl font-bold text-primary dark:text-accent mb-6">Top Selling Categories</h2>
           <div className="h-80 w-full flex flex-col md:flex-row items-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -113,15 +110,14 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* User Management Table Snippet */}
-      <div className="bg-white rounded-xl border-2 border-primary-light shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-primary">Recent Users</h2>
-          <button className="text-accent hover:underline text-sm font-bold">Manage All Users</button>
+      <div className="card overflow-hidden">
+        <div className="p-6 border-b border-white/20 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-primary dark:text-accent">Recent Users</h2>
+          <button onClick={() => alert('👥 User management panel coming soon. This will allow admins to view, verify, and manage all platform users.')} className="text-accent hover:underline text-sm font-bold">Manage All Users</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-bold">
+            <thead className="bg-white/30 dark:bg-white/5 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
               <tr>
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Email</th>
@@ -130,22 +126,22 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-white/10">
               {[
                 { name: 'Sarah Omolo', email: 'sarah@farmer.com', role: 'Farmer', loc: 'Nakuru', status: 'Verified' },
                 { name: 'David Muli', email: 'david@buyer.com', role: 'Buyer', loc: 'Nairobi', status: 'Active' },
                 { name: 'Kevin Kip', email: 'kevin@courier.com', role: 'Courier', loc: 'Eldoret', status: 'Pending' },
               ].map((user, i) => (
-                <tr key={i} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-primary">{user.name}</td>
-                  <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                  <td className="px-6 py-4 text-sm font-semibold capitalize">{user.role}</td>
-                  <td className="px-6 py-4 text-gray-600">{user.loc}</td>
+                <tr key={i} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
+                  <td className="px-6 py-4 font-bold text-primary dark:text-accent">{user.name}</td>
+                  <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
+                  <td className="px-6 py-4 text-sm font-semibold capitalize dark:text-gray-300">{user.role}</td>
+                  <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.loc}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                      user.status === 'Verified' ? 'bg-green-100 text-green-700' :
-                      user.status === 'Active' ? 'bg-blue-100 text-blue-700' :
-                      'bg-yellow-100 text-yellow-700'
+                      user.status === 'Verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                      user.status === 'Active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
                       {user.status}
                     </span>

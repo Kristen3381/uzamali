@@ -34,8 +34,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light dark:bg-zinc-950 p-4 transition-colors duration-300">
-      <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-xl shadow-xl overflow-hidden border-2 border-primary transition-colors">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-md w-full glass rounded-xl shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-primary dark:text-accent">Uza<span className="text-highlight">Mali</span></h1>
