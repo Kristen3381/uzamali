@@ -53,6 +53,7 @@ function App() {
           <Route path="market" element={<ProduceMarket />} />
           <Route path="pricing-tool" element={<PricingTool />} />
           <Route path="messages" element={<Chat />} />
+          <Route path="chat/:orderId" element={<Chat />} />
           <Route path="rewards" element={<RewardsStore />} />
           
           {/* Farmer Routes */}

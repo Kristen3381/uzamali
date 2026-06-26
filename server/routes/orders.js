@@ -3,8 +3,23 @@ import { protect } from '../middleware/auth.js';
 import Order from '../models/Order.js';
 import Listing from '../models/Listing.js';
 import Delivery from '../models/Delivery.js';
+import User from '../models/User.js';
 import { stkPush, b2cPayout } from '../services/mpesa.js';
 import crypto from 'crypto';
+
+const RATE_PER_KM = 50;
+
+const getDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
+};
 
 const router = Router();
 
@@ -33,6 +48,20 @@ router.post('/', protect, async (req, res) => {
     }
 
     const totalPrice = listing.price * quantity;
+    let courierFee = 0;
+
+    if (deliveryMethod === 'courier') {
+      const farmer = await User.findById(listing.farmer).select('location');
+      const farmerLoc = farmer?.location;
+      const buyerLoc = req.user.location;
+
+      if (farmerLoc?.lat && farmerLoc?.lng && buyerLoc?.lat && buyerLoc?.lng) {
+        const distance = getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng);
+        courierFee = Math.max(100, Math.round(distance * RATE_PER_KM));
+      } else {
+        courierFee = 250;
+      }
+    }
 
     const order = await Order.create({
       buyer: req.user._id,
@@ -43,6 +72,7 @@ router.post('/', protect, async (req, res) => {
       deliveryMethod,
       status: 'pending',
       expectedDeliveryDate: expectedDeliveryDate || null,
+      courierFee,
     });
 
     if (deliveryMethod === 'courier') {
@@ -52,6 +82,7 @@ router.post('/', protect, async (req, res) => {
         pickupAddress,
         deliveryAddress,
         status: 'pending',
+        deliveryFee: courierFee,
       });
     }
 

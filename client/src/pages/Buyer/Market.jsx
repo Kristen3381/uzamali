@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Zap, MapPin, BookOpen, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import EduPopup from '../../components/UI/EduPopup';
 import { getProducts, imageUrl } from '../../services/productService';
+import { addToCart } from '../../services/cartService';
 
 const ProduceMarket = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -166,6 +169,7 @@ const ProduceMarket = () => {
               <div className="grid grid-cols-2 gap-2 mt-auto">
                 <button
                   onClick={() => {
+                    addToCart(product);
                     setAddedToCart(product._id);
                     setTimeout(() => setAddedToCart(null), 2000);
                   }}
@@ -182,7 +186,10 @@ const ProduceMarket = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => alert(`🛒 Proceeding to checkout for ${product.name} - KES ${product.price}/${product.unit}`)}
+                  onClick={() => {
+                    addToCart(product);
+                    navigate('/cart');
+                  }}
                   className="btn-highlight flex items-center justify-center gap-1 py-2 px-2 text-sm"
                 >
                   <Zap className="w-4 h-4 fill-current" />

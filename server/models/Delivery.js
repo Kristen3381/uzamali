@@ -10,6 +10,7 @@ const deliverySchema = new mongoose.Schema({
     enum: ['pending', 'in-transit', 'delivered'],
     default: 'pending',
   },
+  deliveryFee: { type: Number, default: 0 },
   acceptedAt: Date,
   deliveredAt: Date,
 }, { timestamps: true });

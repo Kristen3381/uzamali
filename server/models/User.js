@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   sellerTrustLevel: { type: String, enum: ['new', 'verified'], default: 'new' },
   phoneVerified: { type: Boolean, default: false },
   maliPoints: { type: Number, default: 0 },
+  deliveryFee: { type: Number, default: 0 },
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

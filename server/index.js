@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import http from 'http';
+import { Server as SocketServer } from 'socket.io';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -12,6 +14,7 @@ import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payments.js';
 import deliveryRoutes from './routes/deliveries.js';
 import adminRoutes from './routes/admin.js';
+import messageRoutes from './routes/messages.js';
 import User from './models/User.js';
 import Listing from './models/Listing.js';
 import BuyerPreference from './models/BuyerPreference.js';
@@ -20,6 +23,19 @@ import Order from './models/Order.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+const server = http.createServer(app);
+const io = new SocketServer(server, { cors: { origin: '*' } });
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+  });
+  socket.on('leaveRoom', (room) => {
+    socket.leave(room);
+  });
+});
 
 app.use(cors());
 app.use(express.json());
@@ -27,6 +43,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/products', listingRoutes);
 app.use('/api/preferences', preferenceRoutes);
@@ -34,6 +51,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -183,7 +201,7 @@ const start = async () => {
 
   autoDisputeCron();
 
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 };
 
 start().catch((err) => {

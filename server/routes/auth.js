@@ -82,4 +82,13 @@ router.get('/me', protect, async (req, res) => {
   res.json({ user: req.user });
 });
 
+router.get('/couriers', async (req, res) => {
+  try {
+    const couriers = await User.find({ role: 'courier' }).select('name phone deliveryFee');
+    res.json({ couriers });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;

@@ -2,11 +2,51 @@ import { Router } from 'express';
 import { protect } from '../middleware/auth.js';
 import Order from '../models/Order.js';
 import Delivery from '../models/Delivery.js';
+import Listing from '../models/Listing.js';
+import User from '../models/User.js';
 import { sendOtp } from '../services/sms.js';
 import { b2cPayout } from '../services/mpesa.js';
 import crypto from 'crypto';
 
+const RATE_PER_KM = 50;
+
+const getDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
+};
+
 const router = Router();
+
+router.post('/estimate', protect, async (req, res) => {
+  try {
+    const { listingId } = req.body;
+    if (!listingId) return res.status(400).json({ message: 'listingId is required' });
+
+    const listing = await Listing.findById(listingId).populate('farmer', 'location');
+    if (!listing) return res.status(404).json({ message: 'Listing not found' });
+
+    const farmerLoc = listing.farmer?.location;
+    const buyerLoc = req.user.location;
+
+    if (!farmerLoc?.lat || !farmerLoc?.lng || !buyerLoc?.lat || !buyerLoc?.lng) {
+      return res.json({ distance: 0, fee: 250, note: 'Estimated flat fee (location data missing)' });
+    }
+
+    const distance = getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng);
+    const fee = Math.max(100, Math.round(distance * RATE_PER_KM));
+
+    res.json({ distance: Math.round(distance * 10) / 10, fee });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
 
 router.get('/', protect, async (req, res) => {
   try {
