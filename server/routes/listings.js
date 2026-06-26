@@ -40,6 +40,22 @@ const frontendCategoryToBackend = {
   'Other': 'fresh',
 };
 
+const backendCategoryToFrontend = {
+  'fresh': 'Vegetables',
+  'surplus': 'Grains',
+  'agro-waste': 'Agro-waste',
+};
+
+const toFrontend = (listing) => {
+  const doc = listing.toObject ? listing.toObject() : listing;
+  return {
+    ...doc,
+    name: doc.title,
+    category: doc.frontendCategory || backendCategoryToFrontend[doc.category] || doc.category,
+    status: doc.status === 'active' ? 'available' : doc.status,
+  };
+};
+
 const matchBuyers = async (listing) => {
   try {
     const prefs = await BuyerPreference.find({
@@ -105,7 +121,7 @@ router.get('/market', async (req, res) => {
     }
 
     const listings = await Listing.find(filter).sort(sortOption).populate('farmer', 'name location sellerTrustLevel');
-    res.json({ products: listings });
+    res.json({ products: listings.map(toFrontend) });
   } catch {
     res.status(500).json({ message: 'Failed to fetch listings' });
   }
@@ -135,7 +151,7 @@ router.get('/', async (req, res) => {
     }
 
     const listings = await Listing.find(filter).sort(sortOption).populate('farmer', 'name location sellerTrustLevel');
-    res.json({ products: listings });
+    res.json({ products: listings.map(toFrontend) });
   } catch {
     res.status(500).json({ message: 'Failed to fetch products' });
   }
@@ -144,7 +160,7 @@ router.get('/', async (req, res) => {
 router.get('/mine', protect, async (req, res) => {
   try {
     const listings = await Listing.find({ farmer: req.user._id }).sort({ createdAt: -1 });
-    res.json({ products: listings });
+    res.json({ products: listings.map(toFrontend) });
   } catch {
     res.status(500).json({ message: 'Failed to fetch your listings' });
   }
@@ -154,7 +170,7 @@ router.get('/:id', async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id).populate('farmer', 'name location sellerTrustLevel');
     if (!listing) return res.status(404).json({ message: 'Listing not found' });
-    res.json({ product: listing });
+    res.json({ product: toFrontend(listing) });
   } catch {
     res.status(500).json({ message: 'Failed to fetch listing' });
   }
@@ -199,6 +215,7 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
       location,
       images,
       sustainable: sustainable === 'true' || sustainable === true,
+      frontendCategory: category,
     });
 
     matchBuyers(listing);
@@ -221,32 +238,23 @@ router.patch('/:id', protect, upload.array('images', 5), async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const fieldMap = {
-      name: 'title',
-      title: 'title',
-      category: 'category',
-      suggestedUse: 'suggestedUse',
-      price: 'price',
-      unit: 'unit',
-      quantity: 'quantity',
-      harvestDate: 'harvestDate',
-      location: 'location',
-      status: 'status',
-      sustainable: 'sustainable',
-    };
-    Object.entries(fieldMap).forEach(([frontendField, backendField]) => {
-      if (req.body[frontendField] !== undefined) {
-        if (frontendField === 'name') {
-          listing.title = req.body.name;
-        } else if (frontendField === 'category') {
-          listing.category = frontendCategoryToBackend[req.body.category] || req.body.category;
-        } else if (frontendField === 'status') {
-          listing.status = req.body.status === 'available' ? 'active' : req.body.status;
-        } else {
-          listing[backendField] = req.body[frontendField];
-        }
-      }
-    });
+    const upd = {};
+    if (req.body.name !== undefined) upd.title = req.body.name;
+    if (req.body.title !== undefined) upd.title = req.body.title;
+    if (req.body.category !== undefined) {
+      upd.category = frontendCategoryToBackend[req.body.category] || req.body.category;
+      upd.frontendCategory = req.body.category;
+    }
+    if (req.body.suggestedUse !== undefined) upd.suggestedUse = req.body.suggestedUse;
+    if (req.body.price !== undefined) upd.price = Number(req.body.price);
+    if (req.body.unit !== undefined) upd.unit = req.body.unit;
+    if (req.body.quantity !== undefined) upd.quantity = Number(req.body.quantity);
+    if (req.body.harvestDate !== undefined) upd.harvestDate = req.body.harvestDate || undefined;
+    if (req.body.location !== undefined) upd.location = req.body.location;
+    if (req.body.status !== undefined) upd.status = req.body.status === 'available' ? 'active' : req.body.status;
+    if (req.body.sustainable !== undefined) upd.sustainable = req.body.sustainable === 'true' || req.body.sustainable === true;
+
+    Object.assign(listing, upd);
 
     if (req.files?.length) {
       const newImages = req.files.map((f) => `/uploads/${f.filename}`);
@@ -255,7 +263,7 @@ router.patch('/:id', protect, upload.array('images', 5), async (req, res) => {
     }
 
     await listing.save();
-    res.json({ product: listing });
+    res.json({ product: toFrontend(listing) });
   } catch (err) {
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map((e) => e.message);
