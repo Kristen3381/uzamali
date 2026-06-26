@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 import Order from '../models/Order.js';
 import Listing from '../models/Listing.js';
 
@@ -25,14 +26,24 @@ router.post('/mpesa-callback', async (req, res) => {
       }
     }
 
-    const orderRef = MerchantRequestID;
+    const orderRef = MerchantRequestID || '';
 
-    const order = await Order.findOne({
-      $or: [
-        { paymentRef: orderRef },
-        { _id: orderRef.replace('MOCK-', '') },
-      ],
-    });
+    let order = null;
+
+    if (orderRef.startsWith('AGRICYCLE-')) {
+      const idPart = orderRef.replace('AGRICYCLE-', '');
+      if (mongoose.Types.ObjectId.isValid(idPart)) {
+        order = await Order.findById(idPart);
+      }
+    }
+
+    if (!order && mongoose.Types.ObjectId.isValid(orderRef)) {
+      order = await Order.findById(orderRef);
+    }
+
+    if (!order) {
+      order = await Order.findOne({ paymentRef: orderRef });
+    }
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found for callback' });
