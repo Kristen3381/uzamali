@@ -22,11 +22,24 @@ const getDistance = (lat1, lng1, lat2, lng2) => {
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
 };
 
+export const VEHICLE_RATES = {
+  motorcycle: { ratePerKm: 40, minFee: 150, label: 'Motorcycle / Boda-Boda', capacity: 'Up to 50 kg' },
+  tuk_tuk: { ratePerKm: 70, minFee: 300, label: 'Tuk-Tuk / Small Van', capacity: '50 – 300 kg' },
+  pickup: { ratePerKm: 120, minFee: 600, label: 'Pickup Truck (1-Ton)', capacity: '300 – 1,000 kg' },
+  truck: { ratePerKm: 200, minFee: 1500, label: 'Large Lorry (5-Ton+)', capacity: 'Over 1,000 kg' },
+};
+
+export const calculateCourierFee = (distance, vehicleType = 'motorcycle') => {
+  const config = VEHICLE_RATES[vehicleType] || VEHICLE_RATES.motorcycle;
+  const rawFee = Math.round(distance * config.ratePerKm);
+  return Math.max(config.minFee, rawFee);
+};
+
 const router = Router();
 
 router.post('/estimate', protect, async (req, res) => {
   try {
-    const { listingId } = req.body;
+    const { listingId, vehicleType = 'motorcycle' } = req.body;
     if (!listingId) return res.status(400).json({ message: 'listingId is required' });
 
     const listing = await Listing.findById(listingId).populate('farmer', 'location');
@@ -35,14 +48,30 @@ router.post('/estimate', protect, async (req, res) => {
     const farmerLoc = listing.farmer?.location;
     const buyerLoc = req.user.location;
 
-    if (!farmerLoc?.lat || !farmerLoc?.lng || !buyerLoc?.lat || !buyerLoc?.lng) {
-      return res.json({ distance: 0, fee: 250, note: 'Estimated flat fee (location data missing)' });
+    let distance = 15; // default fallback distance if missing GPS
+    if (farmerLoc?.lat && farmerLoc?.lng && buyerLoc?.lat && buyerLoc?.lng) {
+      distance = getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng);
     }
 
-    const distance = getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng);
-    const fee = Math.max(100, Math.round(distance * RATE_PER_KM));
+    const roundedDist = Math.max(1, Math.round(distance * 10) / 10);
+    const selectedFee = calculateCourierFee(roundedDist, vehicleType);
 
-    res.json({ distance: Math.round(distance * 10) / 10, fee });
+    // Build breakdown for all vehicle options
+    const vehicles = {};
+    for (const [vKey, vConfig] of Object.entries(VEHICLE_RATES)) {
+      vehicles[vKey] = {
+        ...vConfig,
+        fee: calculateCourierFee(roundedDist, vKey),
+      };
+    }
+
+    res.json({ 
+      distance: roundedDist, 
+      fee: selectedFee, 
+      vehicleType,
+      vehicles,
+      note: (!farmerLoc?.lat || !buyerLoc?.lat) ? 'Estimated distance (standard route)' : null,
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -142,13 +171,24 @@ router.post('/:id/pickup', protect, async (req, res) => {
 
     const { pickupGps } = req.body;
     if (!pickupGps || pickupGps.lat == null || pickupGps.lng == null) {
-      return res.status(400).json({ message: 'pickupGps with lat and lng is required' });
+      return res.status(400).json({ message: 'Device GPS coordinates are required for pickup verification' });
+    }
+
+    const order = await Order.findById(delivery.order).populate('farmer', 'location name');
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Geofence area check against farmer location
+    const farmerLoc = order.farmer?.location;
+    if (farmerLoc?.lat && farmerLoc?.lng) {
+      const distFromFarm = getDistance(pickupGps.lat, pickupGps.lng, farmerLoc.lat, farmerLoc.lng);
+      if (distFromFarm > 25) {
+        return res.status(400).json({ 
+          message: `Pickup Area Verification Failed: Your device location is ${distFromFarm} km away from ${order.farmer?.name || 'the farm'}'s location. Please confirm when you arrive at the pickup area.` 
+        });
+      }
     }
 
     const otp = crypto.randomInt(100000, 999999).toString();
-
-    const order = await Order.findById(delivery.order);
-    if (!order) return res.status(404).json({ message: 'Order not found' });
 
     order.deliveryOtp = otp;
     order.pickupGps = { lat: pickupGps.lat, lng: pickupGps.lng, timestamp: new Date() };
@@ -160,7 +200,7 @@ router.post('/:id/pickup', protect, async (req, res) => {
     const buyer = await order.populate('buyer', 'phone name');
     await sendOtp(buyer.buyer.phone, otp);
 
-    return res.json({ message: 'Pickup confirmed. OTP sent to buyer.', delivery, otp });
+    return res.json({ message: 'Pickup GPS area verified! OTP sent to buyer.', delivery, otp });
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -184,14 +224,25 @@ router.post('/:id/confirm', protect, async (req, res) => {
     const { otp, deliveryGps } = req.body;
     if (!otp) return res.status(400).json({ message: 'OTP is required' });
     if (!deliveryGps || deliveryGps.lat == null || deliveryGps.lng == null) {
-      return res.status(400).json({ message: 'deliveryGps with lat and lng is required' });
+      return res.status(400).json({ message: 'Device GPS coordinates are required for delivery area verification' });
     }
 
-    const order = await Order.findById(delivery.order);
+    const order = await Order.findById(delivery.order).populate('buyer', 'location name');
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
     if (order.deliveryOtp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+      return res.status(400).json({ message: 'Invalid OTP entered' });
+    }
+
+    // Geofence area check against buyer delivery location
+    const buyerLoc = order.buyer?.location;
+    if (buyerLoc?.lat && buyerLoc?.lng) {
+      const distFromBuyer = getDistance(deliveryGps.lat, deliveryGps.lng, buyerLoc.lat, buyerLoc.lng);
+      if (distFromBuyer > 25) {
+        return res.status(400).json({ 
+          message: `Delivery Area Verification Failed: Your device location is ${distFromBuyer} km away from ${order.buyer?.name || 'the buyer'}'s delivery area.` 
+        });
+      }
     }
 
     order.deliveryGps = { lat: deliveryGps.lat, lng: deliveryGps.lng, timestamp: new Date() };

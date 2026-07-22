@@ -11,6 +11,8 @@ const deliverySchema = new mongoose.Schema({
     default: 'pending',
   },
   deliveryFee: { type: Number, default: 0 },
+  vehicleType: { type: String, enum: ['motorcycle', 'tuk_tuk', 'pickup', 'truck'], default: 'motorcycle' },
+  deliveryDistance: { type: Number, default: 0 },
   acceptedAt: Date,
   deliveredAt: Date,
 }, { timestamps: true });

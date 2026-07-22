@@ -47,6 +47,17 @@ const getAccessToken = () => {
   });
 };
 
+const formatPhone = (phone) => {
+  if (!phone) return '254700000000';
+  let cleaned = String(phone).replace(/[^0-9]/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '254' + cleaned.slice(1);
+  } else if (!cleaned.startsWith('254') && cleaned.length === 9) {
+    cleaned = '254' + cleaned;
+  }
+  return cleaned;
+};
+
 export const stkPush = async (phone, amount, orderId) => {
   if (IS_MOCK) {
     console.log(`[MPESA MOCK] STK Push to ${phone}: KES ${amount} (order ${orderId})`);
@@ -57,18 +68,20 @@ export const stkPush = async (phone, amount, orderId) => {
   const timestamp = getTimestamp();
   const password = getPassword();
 
+  const formattedPhone = formatPhone(phone);
+
   const payload = {
     BusinessShortCode: SHORTCODE,
     Password: password,
     Timestamp: timestamp,
     TransactionType: 'CustomerPayBillOnline',
-    Amount: Math.round(amount),
-    PartyA: phone.replace(/^0+/, '254'),
+    Amount: Math.max(1, Math.round(amount)),
+    PartyA: formattedPhone,
     PartyB: SHORTCODE,
-    PhoneNumber: phone.replace(/^0+/, '254'),
+    PhoneNumber: formattedPhone,
     CallBackURL: CALLBACK_URL,
-    AccountReference: `AGRICYCLE-${orderId}`,
-    TransactionDesc: 'AgriCycle Order Payment',
+    AccountReference: `UZAMALI-${orderId.slice(-6)}`,
+    TransactionDesc: 'UzaMali Produce Order Payment',
   };
 
   return new Promise((resolve, reject) => {

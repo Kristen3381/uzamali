@@ -21,11 +21,13 @@ const getDistance = (lat1, lng1, lat2, lng2) => {
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
 };
 
+import { calculateCourierFee } from './deliveries.js';
+
 const router = Router();
 
 router.post('/', protect, async (req, res) => {
   try {
-    const { listingId, quantity, deliveryMethod, expectedDeliveryDate, pickupAddress, deliveryAddress } = req.body;
+    const { listingId, quantity, deliveryMethod, vehicleType = 'motorcycle', expectedDeliveryDate, pickupAddress, deliveryAddress } = req.body;
 
     if (!listingId || !quantity || !deliveryMethod) {
       return res.status(400).json({ message: 'listingId, quantity, and deliveryMethod are required' });
@@ -49,6 +51,7 @@ router.post('/', protect, async (req, res) => {
 
     const totalPrice = listing.price * quantity;
     let courierFee = 0;
+    let deliveryDistance = 0;
 
     if (deliveryMethod === 'courier') {
       const farmer = await User.findById(listing.farmer).select('location');
@@ -56,11 +59,11 @@ router.post('/', protect, async (req, res) => {
       const buyerLoc = req.user.location;
 
       if (farmerLoc?.lat && farmerLoc?.lng && buyerLoc?.lat && buyerLoc?.lng) {
-        const distance = getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng);
-        courierFee = Math.max(100, Math.round(distance * RATE_PER_KM));
+        deliveryDistance = Math.max(1, Math.round(getDistance(farmerLoc.lat, farmerLoc.lng, buyerLoc.lat, buyerLoc.lng) * 10) / 10);
       } else {
-        courierFee = 250;
+        deliveryDistance = 15; // default estimate
       }
+      courierFee = calculateCourierFee(deliveryDistance, vehicleType);
     }
 
     const order = await Order.create({
@@ -70,6 +73,8 @@ router.post('/', protect, async (req, res) => {
       quantity,
       totalPrice,
       deliveryMethod,
+      vehicleType,
+      deliveryDistance,
       status: 'pending',
       expectedDeliveryDate: expectedDeliveryDate || null,
       courierFee,
@@ -82,6 +87,8 @@ router.post('/', protect, async (req, res) => {
         pickupAddress,
         deliveryAddress,
         status: 'pending',
+        vehicleType,
+        deliveryDistance,
         deliveryFee: courierFee,
       });
     }
@@ -131,14 +138,19 @@ router.get('/', protect, async (req, res) => {
       orders = await Order.find({}).sort('-createdAt');
     } else if (user.role === 'farmer') {
       orders = await Order.find({ farmer: user._id }).sort('-createdAt');
+    } else if (user.role === 'courier') {
+      orders = await Order.find({
+        deliveryMethod: 'courier',
+        $or: [{ courier: user._id }, { courier: null }],
+      }).sort('-createdAt');
     } else {
       orders = await Order.find({ buyer: user._id }).sort('-createdAt');
     }
 
     const populated = await Order.populate(orders, [
-      { path: 'listing', select: 'title price unit images' },
-      { path: 'farmer', select: 'name phone' },
-      { path: 'buyer', select: 'name phone' },
+      { path: 'listing', select: 'title name price unit images location' },
+      { path: 'farmer', select: 'name phone location' },
+      { path: 'buyer', select: 'name phone location' },
       { path: 'courier', select: 'name phone' },
     ]);
 

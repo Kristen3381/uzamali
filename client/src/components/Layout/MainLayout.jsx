@@ -21,7 +21,6 @@ import {
 
 const MobileDropdown = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -91,16 +90,16 @@ const MobileDropdown = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-30 md:hidden" onClick={onClose}>
+    <div className="fixed inset-0 z-30 md:hidden bg-[#0B251D]/80 backdrop-blur-sm" onClick={onClose}>
       <div
         ref={dropdownRef}
         onClick={(e) => e.stopPropagation()}
-        className="absolute top-0 left-0 right-0 glass shadow-2xl border-b border-white/20 animate-slideDown origin-top"
+        className="absolute top-0 left-0 right-0 bg-[#13382E] shadow-2xl border-b border-[#1F5243] animate-slideDown origin-top"
         style={{ animation: 'slideDown 0.25s ease-out' }}
       >
-        <div className="flex items-center justify-between p-4 border-b border-white/20">
-          <span className="text-lg font-bold text-primary dark:text-accent">Navigation</span>
-          <button onClick={onClose} className="p-1 text-gray-400 hover:text-primary">
+        <div className="flex items-center justify-between p-4 border-b border-[#1F5243]">
+          <span className="text-lg font-bold text-white">Navigation</span>
+          <button onClick={onClose} className="p-1 text-[#A3B8B0] hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -110,9 +109,9 @@ const MobileDropdown = ({ isOpen, onClose }) => {
               <button
                 key={link.to}
                 onClick={link.onClick}
-                className="flex items-center gap-3 w-full px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-white/30 dark:hover:bg-white/5 transition-colors text-left"
+                className="flex items-center gap-3 w-full px-4 py-3 text-[#A3B8B0] hover:bg-[#226351]/30 hover:text-white transition-colors text-left"
               >
-                <link.icon className="w-5 h-5 shrink-0 text-primary dark:text-accent" />
+                <link.icon className="w-5 h-5 shrink-0 text-[#E5A93B]" />
                 <span className="font-semibold">{link.label}</span>
               </button>
             ) : (
@@ -123,8 +122,8 @@ const MobileDropdown = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 transition-colors ${
                     isActive
-                      ? 'bg-accent/10 text-primary dark:text-accent border-l-4 border-accent font-bold'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-white/30 dark:hover:bg-white/5'
+                      ? 'bg-[#226351]/50 text-white border-l-4 border-[#E5A93B] font-bold'
+                      : 'text-[#A3B8B0] hover:bg-[#226351]/30 hover:text-white'
                   }`
                 }
               >
@@ -135,14 +134,14 @@ const MobileDropdown = ({ isOpen, onClose }) => {
           )}
         </nav>
         {user && (
-          <div className="border-t border-white/20 p-4 flex items-center justify-between">
+          <div className="border-t border-[#1F5243] p-4 flex items-center justify-between">
             <div className="text-sm">
-              <p className="font-bold text-primary dark:text-accent">{user.name}</p>
-              <p className="text-xs text-gray-400 capitalize">{user.role}</p>
+              <p className="font-bold text-white">{user.name}</p>
+              <p className="text-xs text-[#A3B8B0] capitalize">{user.role}</p>
             </div>
             <button
               onClick={() => { logout(); onClose(); }}
-              className="flex items-center gap-1 text-sm text-red-400 hover:text-red-600 font-semibold"
+              className="flex items-center gap-1 text-sm text-red-400 hover:text-red-300 font-semibold"
             >
               <LogOut className="w-4 h-4" /> Logout
             </button>

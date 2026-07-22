@@ -38,6 +38,8 @@ const orderSchema = new mongoose.Schema({
   mpesaCallbackConfirmed: { type: Boolean, default: false },
   commissionPercent: { type: Number, default: 5 },
   courierFee: { type: Number, default: 0 },
+  vehicleType: { type: String, enum: ['motorcycle', 'tuk_tuk', 'pickup', 'truck'], default: 'motorcycle' },
+  deliveryDistance: { type: Number, default: 0 },
 }, { timestamps: true });
 
 orderSchema.index({ status: 1 });

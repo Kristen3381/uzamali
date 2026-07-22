@@ -76,13 +76,13 @@ const Sidebar = ({ collapsed, onToggleCollapse }) => {
 
   return (
     <aside className={`
-      hidden md:flex flex-col glass-sidebar
+      hidden md:flex flex-col bg-[#13382E] border-r border-[#1F5243]
       transition-all duration-300 ease-in-out
       ${collapsed ? 'w-20' : 'w-64'}
     `}>
       <div className="flex flex-col h-full">
         <div className="flex-1 py-6 overflow-y-auto">
-          <nav className="flex flex-col items-stretch">
+          <nav className="flex flex-col items-stretch space-y-1">
             {getLinks().map((link) =>
               link.onClick ? (
                 <button
@@ -91,7 +91,7 @@ const Sidebar = ({ collapsed, onToggleCollapse }) => {
                   onClick={link.onClick}
                   className={`sidebar-link-inactive w-full text-left flex items-center gap-3 ${collapsed ? 'justify-center' : 'justify-start'}`}
                 >
-                  <link.icon className="w-5 h-5 shrink-0" />
+                  <link.icon className="w-5 h-5 shrink-0 text-[#A3B8B0]" />
                   <span className={`${collapsed ? 'hidden' : ''}`}>{link.label}</span>
                 </button>
               ) : (
@@ -115,7 +115,7 @@ const Sidebar = ({ collapsed, onToggleCollapse }) => {
 
         <button
           onClick={onToggleCollapse}
-          className="flex items-center justify-center p-4 border-t border-white/20 text-gray-400 hover:text-primary dark:hover:text-accent transition-colors"
+          className="flex items-center justify-center p-4 border-t border-[#1F5243] text-[#A3B8B0] hover:text-[#E5A93B] transition-colors"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -126,3 +126,4 @@ const Sidebar = ({ collapsed, onToggleCollapse }) => {
 };
 
 export default Sidebar;
+
