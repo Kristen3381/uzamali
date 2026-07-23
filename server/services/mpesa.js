@@ -1,10 +1,10 @@
-import https from 'https';
+import axios from 'axios';
 
-const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY || 'mock_key';
-const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || 'mock_secret';
-const PASSKEY = process.env.MPESA_PASSKEY || 'mock_passkey';
-const SHORTCODE = process.env.MPESA_SHORTCODE || '174379';
-const CALLBACK_URL = process.env.MPESA_CALLBACK_URL || 'https://yourdomain.com/api/payments/mpesa-callback';
+const CONSUMER_KEY = (process.env.MPESA_CONSUMER_KEY || 'mock_key').trim();
+const CONSUMER_SECRET = (process.env.MPESA_CONSUMER_SECRET || 'mock_secret').trim();
+const PASSKEY = (process.env.MPESA_PASSKEY || 'mock_passkey').trim();
+const SHORTCODE = (process.env.MPESA_SHORTCODE || '174379').trim();
+const CALLBACK_URL = (process.env.MPESA_CALLBACK_URL || 'https://yourdomain.com/api/payments/mpesa-callback').trim();
 const IS_MOCK = process.env.MPESA_MOCK !== 'false';
 
 const getTimestamp = () => {
@@ -22,29 +22,21 @@ const getPassword = () => {
   return Buffer.from(SHORTCODE + PASSKEY + timestamp).toString('base64');
 };
 
-const getAccessToken = () => {
-  return new Promise((resolve, reject) => {
-    if (IS_MOCK) return resolve('mock_access_token');
+const getAccessToken = async () => {
+  if (IS_MOCK) return 'mock_access_token';
 
-    const auth = Buffer.from(CONSUMER_KEY + ':' + CONSUMER_SECRET).toString('base64');
-    const req = https.get(
+  const auth = Buffer.from(CONSUMER_KEY + ':' + CONSUMER_SECRET).toString('base64');
+  try {
+    const { data } = await axios.get(
       'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
-      { headers: { Authorization: 'Basic ' + auth } },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try {
-            resolve(JSON.parse(data).access_token);
-          } catch {
-            reject(new Error('Failed to get access token'));
-          }
-        });
-      }
+      { headers: { Authorization: `Basic ${auth}` } }
     );
-    req.on('error', reject);
-    req.end();
-  });
+    if (data.access_token) return data.access_token;
+    throw new Error(data.errorMessage || 'Access token missing in response');
+  } catch (err) {
+    console.error('[Daraja OAuth Error]:', err.response?.data || err.message);
+    throw new Error(err.response?.data?.errorMessage || err.message || 'Failed to authenticate with Safaricom');
+  }
 };
 
 const formatPhone = (phone) => {
@@ -80,29 +72,22 @@ export const stkPush = async (phone, amount, orderId) => {
     PartyB: SHORTCODE,
     PhoneNumber: formattedPhone,
     CallBackURL: CALLBACK_URL,
-    AccountReference: `UZAMALI-${orderId.slice(-6)}`,
+    AccountReference: `UZAMALI-${String(orderId).slice(-6)}`,
     TransactionDesc: 'UzaMali Produce Order Payment',
   };
 
-  return new Promise((resolve, reject) => {
-    const req = https.post(
+  try {
+    const { data } = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
-      { headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' } },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try {
-            resolve(JSON.parse(data));
-          } catch {
-            reject(new Error('STK Push failed'));
-          }
-        });
-      }
+      payload,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
-    req.write(JSON.stringify(payload));
-    req.end();
-  });
+    console.log('[Daraja STK Push Response]:', data);
+    return data;
+  } catch (err) {
+    console.error('[Daraja STK Push Request Error]:', err.response?.data || err.message);
+    throw new Error(err.response?.data?.errorMessage || err.response?.data?.ResponseDescription || err.message);
+  }
 };
 
 export const b2cPayout = async (phone, amount, orderId, reason = 'BusinessPayment') => {
@@ -112,8 +97,6 @@ export const b2cPayout = async (phone, amount, orderId, reason = 'BusinessPaymen
   }
 
   const token = await getAccessToken();
-  const timestamp = getTimestamp();
-  const password = getPassword();
 
   const payload = {
     InitiatorName: process.env.MPESA_INITIATOR || 'testapi',
@@ -121,30 +104,23 @@ export const b2cPayout = async (phone, amount, orderId, reason = 'BusinessPaymen
     CommandID: reason,
     Amount: Math.round(amount),
     PartyA: SHORTCODE,
-    PartyB: phone.replace(/^0+/, '254'),
-    Remarks: `AgriCycle payout order ${orderId}`,
-    QueueTimeOutURL: CALLBACK_URL.replace('callback', 'timeout'),
-    ResultURL: CALLBACK_URL.replace('callback', 'result'),
-    Occasion: 'AgriCycle',
+    PartyB: formatPhone(phone),
+    Remarks: `UzaMali payout order ${orderId}`,
+    QueueTimeOutURL: CALLBACK_URL.replace('mpesa-callback', 'timeout'),
+    ResultURL: CALLBACK_URL.replace('mpesa-callback', 'result'),
+    Occasion: 'UzaMali',
   };
 
-  return new Promise((resolve, reject) => {
-    const req = https.post(
+  try {
+    const { data } = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/b2c/v3/paymentrequest',
-      { headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' } },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try {
-            resolve(JSON.parse(data));
-          } catch {
-            reject(new Error('B2C failed'));
-          }
-        });
-      }
+      payload,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
-    req.write(JSON.stringify(payload));
-    req.end();
-  });
+    return data;
+  } catch (err) {
+    console.error('[Daraja B2C Error]:', err.response?.data || err.message);
+    throw new Error(err.response?.data?.errorMessage || err.message);
+  }
 };
+

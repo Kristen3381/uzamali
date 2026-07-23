@@ -113,16 +113,20 @@ router.post('/', protect, async (req, res) => {
       }
 
       const populated = await Order.findById(order._id)
-        .populate('listing', 'title price unit images')
+        .populate('listing', 'title name price unit images')
         .populate('farmer', 'name phone');
 
       return res.status(201).json({ order: populated });
     } catch (err) {
+      console.error('[M-Pesa Checkout Error]:', err.message);
       await Order.findByIdAndDelete(order._id);
       if (deliveryMethod === 'courier') {
         await Delivery.findOneAndDelete({ order: order._id });
       }
-      return res.status(502).json({ message: 'Payment initiation failed', error: err.message });
+      return res.status(502).json({ 
+        message: `M-Pesa Payment Initiation Failed: ${err.message}`, 
+        error: err.message 
+      });
     }
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
