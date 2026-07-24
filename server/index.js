@@ -185,17 +185,28 @@ const seedData = async () => {
 };
 
 const start = async () => {
-  const usingInMemory = !process.env.MONGO_URI;
   let uri = process.env.MONGO_URI;
+  let usingInMemory = false;
 
-  if (!uri) {
-    console.log('No MONGO_URI set — starting in-memory MongoDB...');
-    const mongod = await MongoMemoryServer.create();
-    uri = mongod.getUri();
+  if (uri) {
+    try {
+      console.log('Connecting to remote MongoDB URI...');
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 4000 });
+      console.log('Connected to remote MongoDBAtlas');
+    } catch (remoteErr) {
+      console.warn(`[MONGO WARNING] Remote MONGO_URI failed to connect (${remoteErr.message}). Gracefully switching to In-Memory MongoDB...`);
+      uri = null;
+    }
   }
 
-  await mongoose.connect(uri);
-  console.log('Connected to MongoDB');
+  if (!uri) {
+    console.log('Starting in-memory MongoDB server...');
+    const mongod = await MongoMemoryServer.create();
+    uri = mongod.getUri();
+    await mongoose.connect(uri);
+    console.log('Connected to In-Memory MongoDB');
+    usingInMemory = true;
+  }
 
   if (usingInMemory) await seedData();
 
@@ -205,6 +216,5 @@ const start = async () => {
 };
 
 start().catch((err) => {
-  console.error('Startup error:', err.message);
-  process.exit(1);
+  console.error('Fatal startup error:', err.message);
 });

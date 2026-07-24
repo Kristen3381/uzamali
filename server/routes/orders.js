@@ -116,6 +116,10 @@ router.post('/', protect, async (req, res) => {
         .populate('listing', 'title name price unit images')
         .populate('farmer', 'name phone');
 
+      if (deliveryMethod === 'courier') {
+        req.app.get('io')?.emit('newDeliveryJob', { order: populated });
+      }
+
       return res.status(201).json({ order: populated });
     } catch (err) {
       console.error('[M-Pesa Checkout Error]:', err.message);

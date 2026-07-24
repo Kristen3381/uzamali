@@ -28,6 +28,7 @@ import AdminDashboard from './pages/Admin/Dashboard';
 
 // Common Pages
 import PricingTool from './pages/Common/PricingTool';
+import WasteExchange from './pages/Common/WasteExchange';
 import Chat from './pages/Common/Chat';
 import RewardsStore from './pages/Common/RewardsStore';
 
@@ -52,6 +53,7 @@ function App() {
           <Route index element={<Navigate to="/market" />} />
           <Route path="market" element={<ProduceMarket />} />
           <Route path="pricing-tool" element={<PricingTool />} />
+          <Route path="waste-exchange" element={<WasteExchange />} />
           <Route path="messages" element={<Chat />} />
           <Route path="chat/:orderId" element={<Chat />} />
           <Route path="rewards" element={<RewardsStore />} />

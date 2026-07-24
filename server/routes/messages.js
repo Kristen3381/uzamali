@@ -12,8 +12,10 @@ router.get('/:orderId', protect, async (req, res) => {
 
     const userId = req.user._id.toString();
     const isParticipant =
-      userId === order.buyer.toString() ||
-      userId === order.farmer.toString() ||
+      req.user.role === 'courier' ||
+      req.user.role === 'admin' ||
+      userId === order.buyer?.toString() ||
+      userId === order.farmer?.toString() ||
       (order.courier && userId === order.courier.toString());
 
     if (!isParticipant) {
@@ -40,8 +42,10 @@ router.post('/:orderId', protect, async (req, res) => {
 
     const userId = req.user._id.toString();
     const isParticipant =
-      userId === order.buyer.toString() ||
-      userId === order.farmer.toString() ||
+      req.user.role === 'courier' ||
+      req.user.role === 'admin' ||
+      userId === order.buyer?.toString() ||
+      userId === order.farmer?.toString() ||
       (order.courier && userId === order.courier.toString());
 
     if (!isParticipant) {

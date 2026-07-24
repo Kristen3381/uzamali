@@ -33,28 +33,23 @@ const MobileDropdown = ({ isOpen, onClose }) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isOpen, onClose]);
 
-  const handleWasteClick = () => {
-    alert('♻️ Waste Exchange coming soon! Farmers will be able to list and trade agro-waste for biogas, briquettes, and silage.');
-    onClose();
-  };
-
   const farmerLinks = [
     { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/farmer/products', icon: Package, label: 'My Products' },
     { to: '/market', icon: Store, label: 'Produce Market' },
+    { to: '/waste-exchange', icon: Trash2, label: 'Waste Exchange' },
     { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
     { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
-    { to: '#', icon: Trash2, label: 'Waste Exchange', onClick: handleWasteClick },
   ];
 
   const buyerLinks = [
     { to: '/market', icon: Store, label: 'Produce Market' },
+    { to: '/waste-exchange', icon: Trash2, label: 'Waste Exchange' },
     { to: '/orders', icon: History, label: 'My Orders' },
     { to: '/messages', icon: MessageSquare, label: 'Courier Chat' },
     { to: '/rewards', icon: Gift, label: 'Rewards Store' },
     { to: '/pricing-tool', icon: Calculator, label: 'Pricing Tool' },
-    { to: '#', icon: Trash2, label: 'Waste Exchange', onClick: handleWasteClick },
   ];
 
   const courierLinks = [
@@ -72,6 +67,7 @@ const MobileDropdown = ({ isOpen, onClose }) => {
     if (!user) {
       return [
         { to: '/market', icon: Store, label: 'Produce Market' },
+        { to: '/waste-exchange', icon: Trash2, label: 'Waste Exchange' },
         { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/farmer/add-product', icon: PlusCircle, label: 'Add Product' },
         { to: '/rewards', icon: Gift, label: 'Rewards Store' },
